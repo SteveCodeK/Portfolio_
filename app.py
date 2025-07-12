@@ -27,6 +27,7 @@ app.config['SITEMAP_URL_SCHEME'] = 'https' # Use https for production
 app.config['SITEMAP_GENERATOR_OPTIONS'] = {'base_url': os.environ.get('SITEMAP_BASE_URL', 'http://127.0.0.1:5000')}
 
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login' # Redirect unauthenticated users to login page
 
