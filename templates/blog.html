@@ -1,0 +1,26 @@
+{% extends "base.html" %} {# Assumes you have a base.html for common structure #}
+
+{% block content %}
+<div class="container mx-auto px-4 py-16 md:py-24 max-w-3xl">
+    <article class="bg-white rounded-lg shadow-lg p-8">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-blue-800 mb-6 text-center leading-tight">
+            {{ post.title }}
+        </h1>
+        <p class="text-gray-500 text-sm mb-8 text-center">
+            Published on {{ post.date_posted.strftime('%B %d, %Y') }}
+        </p>
+
+        <div class="prose max-w-none text-gray-700 leading-relaxed text-lg">
+
+            {# The 'content' field will likely contain HTML, so use 'safe' filter #}
+            {{ post.content | safe }}
+        </div>
+
+        <div class="mt-12 text-center">
+            <a href="{{ url_for('blog') }}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                &larr; Back to Blog Posts
+            </a>
+        </div>
+    </article>
+</div>
+{% endblock %}

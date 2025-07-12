@@ -1,0 +1,10 @@
+# static/robots.txt
+User-agent: *
+Allow: /
+
+# Disallow admin areas
+Disallow: /admin/
+Disallow: /login/
+Disallow: /register/ # If you have one and don't want it indexed
+
+Sitemap: https://www.yourdomain.com/sitemap.xml # Link to your sitemap!

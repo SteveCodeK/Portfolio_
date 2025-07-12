@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{ description | default('Explore the professional portfolio and blog of Stephen Awili, showcasing expertise in Zoho CRM, Python, and more.') }}">
+    <meta property="og:title" content="{{ title | default('Stephen Awili - Portfolio & Blog') }}">
+    <meta property="og:description" content="{{ description | default('Explore the professional portfolio and blog of Stephen Awili...') }}">
+    <meta property="og:url" content="{{ request.base_url }}"> {# Uses current page URL #}
+    <meta property="og:type" content="website"> {# Or "article" for blog posts #}
+    {# Corrected image path: Assuming MYPROFILE.jpg is directly in your 'static' folder #}
+    <meta property="og:image" content="{{ url_for('static', filename='MYPROFILE.jpg', _external=True) }}">
+    <title>{{ title | default('Stephen Awili - Portfolio & Blog') }}</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="canonical" href="{{ request.base_url }}">
+    <style>
+        /* Custom styles for the Inter font and smooth scrolling */
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+            background-color: #f8fafc; /* Light blue-gray background */
+        }
+        /* Style for active navigation link (optional, for future JS implementation) */
+        .nav-link.active {
+            font-weight: 600;
+            color: #1d4ed8; /* Blue-700 */
+        }
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; /* Slate-300 */
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; /* Slate-400 */
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <nav class="bg-white shadow-sm p-4 sticky top-0 z-50 rounded-b-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="{{ url_for('home') }}" class="text-2xl font-bold text-blue-700 rounded-md p-2 hover:bg-blue-50 transition-colors">
+                Stephen Awili Mugenya
+            </a>
+
+            <button id="menu-toggle" class="md:hidden text-gray-600 hover:text-blue-700 focus:outline-none">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                </svg>
+            </button>
+
+            <div id="desktop-menu" class="hidden md:flex space-x-4">
+                <a href="{{ url_for('home') }}#about" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">About</a>
+                <a href="{{ url_for('home') }}#skills" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">Skills</a>
+                <a href="{{ url_for('portfolio') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">Portfolio</a>
+                <a href="{{ url_for('blog') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">Blog</a>
+                <a href="{{ url_for('home') }}#contact" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">Contact</a>
+
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('admin_dashboard') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">Admin</a>
+                <a href="{{ url_for('logout') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">Logout</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden flex flex-col items-center py-4 space-y-3 bg-white border-t border-gray-200">
+            <a href="{{ url_for('home') }}#about" class="nav-link text-gray-600 hover:text-blue-700 transition-colors w-full text-center py-2 rounded-md hover:bg-blue-50">About</a>
+            <a href="{{ url_for('home') }}#skills" class="nav-link text-gray-600 hover:text-blue-700 transition-colors w-full text-center py-2 rounded-md hover:bg-blue-50">Skills</a>
+            <a href="{{ url_for('portfolio') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors w-full text-center py-2 rounded-md hover:bg-blue-50">Portfolio</a>
+            <a href="{{ url_for('blog') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors w-full text-center py-2 rounded-md hover:bg-blue-50">Blog</a>
+            <a href="{{ url_for('home') }}#contact" class="nav-link text-gray-600 hover:text-blue-700 transition-colors w-full text-center py-2 rounded-md hover:bg-blue-50">Contact</a>
+
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('admin_dashboard') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors w-full text-center py-2 rounded-md hover:bg-blue-50">Admin</a>
+            <a href="{{ url_for('logout') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors w-full text-center py-2 rounded-md hover:bg-blue-50">Logout</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="p-3 mb-4 rounded-md text-sm {% if category == 'success' %}bg-green-100 text-green-800{% elif category == 'danger' %}bg-red-100 text-red-800{% else %}bg-blue-100 text-blue-800{% endif %}" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    {% block content %}{% endblock %}
+
+    <br />
+    <footer class="bg-gray-800 text-white py-6 text-center rounded-t-lg">
+        <div class="container mx-auto px-4">
+            <p>&copy; 2025 Stephen Awili Mugenya. All rights reserved.</p>
+        </div>
+    </footer>
+
+    {% block scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            // Toggle mobile menu visibility
+            menuToggle.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Close mobile menu when a link is clicked
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const hash = this.getAttribute('href');
+                    const targetId = hash.substring(1);
+                    const targetElement = document.getElementById(targetId);
+
+                    // Check if the link is an internal hash and we are on the same page
+                    // or if it's explicitly navigating to the home page's hash
+                    const isInternalHashOnSamePage = hash.startsWith('#') && (window.location.pathname === '/' || window.location.pathname === '/home');
+                    const isExternalHomeHash = hash.startsWith('{{ url_for('home') }}#') && window.location.origin + window.location.pathname !== '{{ url_for('home', _external=False) }}';
+
+                    if (targetElement && (isInternalHashOnSamePage || isExternalHomeHash)) {
+                        e.preventDefault(); // Prevent instant jump
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // Handle smooth scrolling when the page loads with a hash (e.g., navigating from another page to home#about)
+            document.addEventListener('DOMContentLoaded', () => {
+                if (window.location.hash) {
+                    const targetId = window.location.hash.substring(1);
+                    const targetElement = document.getElementById(targetId);
+                    if (targetElement) {
+                        // Slight delay to allow page rendering before scrolling
+                        setTimeout(() => {
+                            targetElement.scrollIntoView({
+                                behavior: 'smooth'
+                            });
+                        }, 100);
+                    }
+                }
+            });
+        });
+    </script>
+    {% endblock %}
+</body>
+</html>

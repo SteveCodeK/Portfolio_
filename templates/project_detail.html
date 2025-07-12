@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-16 md:py-24 max-w-4xl">
+    <article class="bg-white rounded-lg shadow-lg p-8">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-blue-800 mb-6 text-center leading-tight">
+            {{ project.title }}
+        </h1>
+
+        {# Optional: Add a project image here if you have one #}
+        {% if project.image_url %}
+        <div class="mb-8 text-center">
+            <img src="{{ url_for('static', filename='img/' + project.image_url) }}" alt="{{ project.title }}" class="w-full h-auto rounded-lg shadow-md max-w-xl mx-auto object-cover">
+        </div>
+        {% endif %}
+
+        <div class="prose max-w-none text-gray-700 leading-relaxed text-lg mb-8">
+            {{ project.description | safe }} {# Use | safe if description contains HTML #}
+        </div>
+
+        {% if project.skills_used %}
+        <div class="mb-6">
+            <p class="font-semibold text-blue-700 text-lg mb-2">Skills Used:</p>
+            <div class="flex flex-wrap gap-2">
+                {% for skill in project.skills_used.split(',') %} {# Assuming skills are comma-separated #}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                    {{ skill.strip() }}
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="flex flex-wrap justify-center gap-4 mt-8">
+            {% if project.case_study_link %}
+            <a href="{{ project.case_study_link }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
+                View Case Study
+            </a>
+            {% endif %}
+            {% if project.demo_link %}
+            <a href="{{ project.demo_link }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors">
+                View Live Demo
+            </a>
+            {% endif %}
+        </div>
+
+        <div class="mt-12 text-center">
+            <a href="{{ url_for('portfolio') }}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                &larr; Back to Portfolio
+            </a>
+        </div>
+    </article>
+</div>
+{% endblock %}

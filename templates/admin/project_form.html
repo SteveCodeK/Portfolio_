@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mx-auto px-4 py-16 md:py-24 max-w-2xl">
+    <div class="bg-white rounded-lg shadow-lg p-8">
+        <h1 class="text-3xl font-bold text-blue-700 mb-8 text-center">{{ legend }}</h1>
+        <form method="POST" action="" class="space-y-6">
+            {{ form.hidden_tag() }}
+
+            <div>
+                {{ form.title.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+                {{ form.title(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+                {% for error in form.title.errors %}
+                <span class="text-red-500 text-xs italic">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div>
+                {{ form.description.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+                {{ form.description(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-48", rows="10") }}
+                {% for error in form.description.errors %}
+                <span class="text-red-500 text-xs italic">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div>
+                {{ form.skills_used.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+                {{ form.skills_used(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline", placeholder="e.g., Zoho CRM, Python, Deluge") }}
+                {% for error in form.skills_used.errors %}
+                <span class="text-red-500 text-xs italic">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div>
+                {{ form.demo_link.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+                {{ form.demo_link(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline", placeholder="https://example.com/demo") }}
+                {% for error in form.demo_link.errors %}
+                <span class="text-red-500 text-xs italic">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div>
+                {{ form.case_study_link.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+                {{ form.case_study_link(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline", placeholder="https://example.com/case-study") }}
+                {% for error in form.case_study_link.errors %}
+                <span class="text-red-500 text-xs italic">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div>
+                {{ form.submit(class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer") }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
