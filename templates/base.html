@@ -3,14 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="{{ description | default('Explore the professional portfolio and blog of Stephen Awili, showcasing expertise in Zoho CRM, Python, and more.') }}">
-    <meta property="og:title" content="{{ title | default('Stephen Awili - Portfolio & Blog') }}">
-    <meta property="og:description" content="{{ description | default('Explore the professional portfolio and blog of Stephen Awili...') }}">
-    <meta property="og:url" content="{{ request.base_url }}"> {# Uses current page URL #}
-    <meta property="og:type" content="website"> {# Or "article" for blog posts #}
-    {# Corrected image path: Assuming MYPROFILE.jpg is directly in your 'static' folder #}
-    <meta property="og:image" content="{{ url_for('static', filename='MYPROFILE.jpg', _external=True) }}">
-    <title>{{ title | default('Stephen Awili - Portfolio & Blog') }}</title>
+    <title>Stephen Awili - Zoho & IT Specialist Portfolio | CRM, Python, Analytics</title>
+    <meta name="description" content="Explore the professional portfolio of Stephen Awili, an IT Specialist and Zoho Consultant. Specializing in Zoho CRM customization, Creator app development, Deluge scripting, Zoho Analytics, Python for data analysis, and interactive dashboard creation.">
+    <meta name="keywords" content="Stephen Awili, Zoho consultant, Zoho implementation, Zoho CRM customization, Zoho Creator development, Deluge scripting, Zoho Analytics, Python development, data analysis, dashboard creation, IT specialist, IT consulting Kenya, Zoho expert, business automation">
+    <meta name="author" content="Stephen Awili">
+    <meta property="og:type" content="website">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -42,9 +39,9 @@
             border-radius: 10px;
         }
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; /* Slate-400 */
-        }
+            ::-webkit-scrollbar-thumb:hover {
+                background: #94a3b8; /* Slate-400 */
+            }
     </style>
 </head>
 <body class="text-gray-800">
