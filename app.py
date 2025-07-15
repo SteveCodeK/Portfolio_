@@ -10,6 +10,8 @@ from flask_sitemap import Sitemap # Correct import
 import os # Already imported, just for context
 from werkzeug.utils import secure_filename # Already imported, just for context
 
+from dotenv import load_dotenv
+load_dotenv()
 # Configure a directory for uploads
 UPLOAD_FOLDER = 'static/uploads' # Make sure this directory exists!
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -35,7 +37,7 @@ login_manager.login_view = 'login' # Redirect unauthenticated users to login pag
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
+    password_hash = db.Column(db.String(658), nullable=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
