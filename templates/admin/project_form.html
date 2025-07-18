@@ -3,7 +3,7 @@
 <div class="container mx-auto px-4 py-16 md:py-24 max-w-2xl">
     <div class="bg-white rounded-lg shadow-lg p-8">
         <h1 class="text-3xl font-bold text-blue-700 mb-8 text-center">{{ legend }}</h1>
-        <form method="POST" action="" class="space-y-6">
+        <form method="POST" action="" class="space-y-6" enctype="multipart/form-data">
             {{ form.hidden_tag() }}
 
             <div>
@@ -14,36 +14,42 @@
                 {% endfor %}
             </div>
 
+            {# Keep description if you want a separate short one #}
             <div>
                 {{ form.description.label(class="block text-gray-700 text-sm font-bold mb-2") }}
-                {{ form.description(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-48", rows="10") }}
+                {{ form.description(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-24", rows="5") }}
                 {% for error in form.description.errors %}
                 <span class="text-red-500 text-xs italic">{{ error }}</span>
                 {% endfor %}
             </div>
 
+            {# This is your rich text content field #}
             <div>
-                {{ form.skills_used.label(class="block text-gray-700 text-sm font-bold mb-2") }}
-                {{ form.skills_used(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline", placeholder="e.g., Zoho CRM, Python, Deluge") }}
-                {% for error in form.skills_used.errors %}
+                {{ form.content.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+                {{ form.content(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-48", rows="10", id="project-content-editor") }}
+                {% for error in form.content.errors %}
                 <span class="text-red-500 text-xs italic">{{ error }}</span>
                 {% endfor %}
             </div>
 
-            <div>
-                {{ form.demo_link.label(class="block text-gray-700 text-sm font-bold mb-2") }}
-                {{ form.demo_link(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline", placeholder="https://example.com/demo") }}
-                {% for error in form.demo_link.errors %}
-                <span class="text-red-500 text-xs italic">{{ error }}</span>
-                {% endfor %}
-            </div>
+            {# ... rest of your form fields ... #}
 
-            <div>
-                {{ form.case_study_link.label(class="block text-gray-700 text-sm font-bold mb-2") }}
-                {{ form.case_study_link(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline", placeholder="https://example.com/case-study") }}
-                {% for error in form.case_study_link.errors %}
-                <span class="text-red-500 text-xs italic">{{ error }}</span>
+            {# New: Image upload field for project #}
+            <div class="form-group">
+                {{ form.image.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+                {{ form.image(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+                {% if form.image.errors %}
+                {% for error in form.image.errors %}
+                <span class="text-red-500 text-xs italic">{{ error }}</span><br>
                 {% endfor %}
+                {% endif %}
+                {# Display current image when editing #}
+                {% if current_image and current_image != 'default_project.jpg' %}
+                <p class="text-gray-600 text-sm mt-2">Current Image:</p>
+                <img src="{{ url_for('static', filename='uploads/' + current_image) }}" class="img-thumbnail mt-2 rounded-md" style="width: 150px; height: 150px; object-fit: cover;">
+                {% elif current_image and current_image == 'default_project.jpg' and legend == 'Edit Project' %}
+                <p class="text-gray-600 text-sm mt-2">No custom image uploaded. Using default.</p>
+                {% endif %}
             </div>
 
             <div>
@@ -52,4 +58,63 @@
         </form>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+<script src="https://cdn.tiny.cloud/1/s8fcksw29pdzm6ocyxze8notxj126qq5rvbyrid88fmknjmh/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
+<script>
+    tinymce.init({
+        selector: '#blog-content-editor', // Or #project-content-editor
+        // ... other configurations ...
+
+        automatic_uploads: true,
+        file_picker_types: 'image',
+        images_upload_url: '{{ url_for("upload_image") }}', // Crucial: Your Flask endpoint
+
+        // This is the handler that's throwing the error
+        images_upload_handler: function (blobInfo, success, failure) {
+            var xhr, formData;
+
+            xhr = new XMLHttpRequest();
+            xhr.withCredentials = false; // Important if you have CORS issues, but generally false for same-origin
+            xhr.open('POST', '{{ url_for("upload_image") }}'); // Match this with images_upload_url
+
+            xhr.onload = function() {
+                var json;
+
+                if (xhr.status != 200) {
+                    failure('HTTP Error: ' + xhr.status);
+                    return;
+                }
+
+                try { // Add a try-catch for JSON parsing errors
+                    json = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    failure('Failed to parse JSON response: ' + e.message);
+                    return;
+                }
+
+                // Make sure your Flask endpoint returns a JSON with a 'location' key
+                if (!json || typeof json.location != 'string') {
+                    failure('Invalid JSON response: ' + xhr.responseText);
+                    return;
+                }
+
+                success(json.location); // This is where TinyMCE gets the image URL
+            };
+
+            xhr.onerror = function () { // Add an error handler for network issues
+                failure('Image upload failed due. Network error or server issues.');
+            };
+
+            formData = new FormData();
+            formData.append('file', blobInfo.blob(), blobInfo.filename()); // 'file' must match Flask's request.files key
+
+            xhr.send(formData);
+        }
+    });
+</script>
 {% endblock %}

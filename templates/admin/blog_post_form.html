@@ -4,9 +4,10 @@
 <div class="container mx-auto px-4 py-16 md:py-24 max-w-2xl">
     <div class="bg-white rounded-lg shadow-lg p-8">
         <h1 class="text-3xl font-bold text-blue-700 mb-8 text-center">{{ legend }}</h1>
-        <form method="POST" action="" class="space-y-6">
+        {# IMPORTANT: Add enctype="multipart/form-data" for file uploads #}
+        <form method="POST" action="" class="space-y-6" enctype="multipart/form-data">
             {{ form.hidden_tag() }} {# This adds the CSRF token #}
-            
+
             <div>
                 {{ form.title.label(class="block text-gray-700 text-sm font-bold mb-2") }}
                 {{ form.title(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
@@ -24,6 +25,24 @@
                 {% endfor %}
             </div>
 
+            {# New: Image upload field #}
+            <div class="form-group">
+                {{ form.image.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+                {{ form.image(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+                {% if form.image.errors %}
+                    {% for error in form.image.errors %}
+                        <span class="text-red-500 text-xs italic">{{ error }}</span><br>
+                    {% endfor %}
+                {% endif %}
+                {# Display current image when editing #}
+                {% if current_image and current_image != 'default_blog.jpg' %}
+                    <p class="text-gray-600 text-sm mt-2">Current Image:</p>
+                    <img src="{{ url_for('static', filename='uploads/' + current_image) }}" class="img-thumbnail mt-2 rounded-md" style="width: 150px; height: 150px; object-fit: cover;">
+                {% elif current_image and current_image == 'default_blog.jpg' and legend == 'Edit Blog Post' %}
+                    <p class="text-gray-600 text-sm mt-2">No custom image uploaded. Using default.</p>
+                {% endif %}
+            </div>
+
             <div>
                 {{ form.submit(class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer") }}
             </div>
@@ -33,36 +52,22 @@
 {% endblock %}
 
 {% block scripts %}
-{{ super() }} {# Call super() to include any scripts from parent templates, like base.html #}
-
-<script src="https://cdn.tiny.cloud/1/s8fcksw29pdzm6ocyxze8notxj126qq5rvbyrid88fmknjmh/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-
-
 <script>
     tinymce.init({
-        selector: '#blog-content-editor', // Target the textarea by its ID
-        plugins: 'advlist autolink lists link image charmap print preview anchor searchreplace visualblocks code fullscreen insertdatetime media table paste code help wordcount',
-        toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help | link image media',
-        height: 500, // Adjust editor height
-        menubar: 'file edit view insert format tools table help',
-        content_css: [
-            '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
-            '//www.tiny.cloud/css/codepen.min.css'
-        ],
-        // You can add more options here, like custom styles, fonts, etc.
-        // For custom font sizes:
-        font_size_formats: '8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt',
-        // For custom font families:
-        font_family_formats: 'Arial=arial,helvetica,sans-serif; Courier New=courier new,courier,monospace; Georgia=georgia,times new roman,times,serif; Tahoma=tahoma,arial,helvetica,sans-serif; Times New Roman=times new roman,times,serif; Verdana=verdana,arial,helvetica,sans-serif;',
-        // For image upload (requires backend implementation - see notes below)
+        selector: '#blog-content-editor', // Or #project-content-editor
+        // ... other configurations ...
+
         automatic_uploads: true,
         file_picker_types: 'image',
-        images_upload_url: '{{ url_for("upload_image") }}', // Create this Flask route
+        images_upload_url: '{{ url_for("upload_image") }}', // Crucial: Your Flask endpoint
+
+        // This is the handler that's throwing the error
         images_upload_handler: function (blobInfo, success, failure) {
             var xhr, formData;
+
             xhr = new XMLHttpRequest();
-            xhr.withCredentials = false;
-            xhr.open('POST', '{{ url_for("upload_image") }}'); // Your Flask endpoint for image upload
+            xhr.withCredentials = false; // Important if you have CORS issues, but generally false for same-origin
+            xhr.open('POST', '{{ url_for("upload_image") }}'); // Match this with images_upload_url
 
             xhr.onload = function() {
                 var json;
@@ -72,18 +77,28 @@
                     return;
                 }
 
-                json = JSON.parse(xhr.responseText);
-
-                if (!json || typeof json.location != 'string') {
-                    failure('Invalid JSON: ' + xhr.responseText);
+                try { // Add a try-catch for JSON parsing errors
+                    json = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    failure('Failed to parse JSON response: ' + e.message);
                     return;
                 }
 
-                success(json.location);
+                // Make sure your Flask endpoint returns a JSON with a 'location' key
+                if (!json || typeof json.location != 'string') {
+                    failure('Invalid JSON response: ' + xhr.responseText);
+                    return;
+                }
+
+                success(json.location); // This is where TinyMCE gets the image URL
+            };
+
+            xhr.onerror = function () { // Add an error handler for network issues
+                failure('Image upload failed due. Network error or server issues.');
             };
 
             formData = new FormData();
-            formData.append('file', blobInfo.blob(), blobInfo.filename());
+            formData.append('file', blobInfo.blob(), blobInfo.filename()); // 'file' must match Flask's request.files key
 
             xhr.send(formData);
         }

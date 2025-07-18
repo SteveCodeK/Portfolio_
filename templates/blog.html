@@ -10,8 +10,12 @@
             Published on {{ post.date_posted.strftime('%B %d, %Y') }}
         </p>
 
-        <div class="prose max-w-none text-gray-700 leading-relaxed text-lg">
+        {# Display Featured Image for Blog Post #}
+        <div class="mb-8 text-center">
+            <img src="{{ url_for('static', filename='uploads/' + post.image_file) }}" alt="{{ post.title }}" class="w-full h-auto max-h-96 object-cover rounded-lg shadow-md mx-auto">
+        </div>
 
+        <div class="prose max-w-none text-gray-700 leading-relaxed text-lg">
             {# The 'content' field will likely contain HTML, so use 'safe' filter #}
             {{ post.content | safe }}
         </div>

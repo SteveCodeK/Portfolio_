@@ -9,7 +9,10 @@ import bleach
 from flask_sitemap import Sitemap # Correct import
 import os # Already imported, just for context
 from werkzeug.utils import secure_filename # Already imported, just for context
-
+import secrets # Add this import if you haven't already
+from PIL import Image 
+from flask import current_app
+from slugify import slugify
 from dotenv import load_dotenv
 load_dotenv()
 # Configure a directory for uploads
@@ -53,7 +56,9 @@ class BlogPost(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text, nullable=False)
+    slug = db.Column(db.String(120), unique=True, nullable=False)
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    image_file = db.Column(db.String(20), nullable=False, default='default.jpg') # New column for image
     # Add a column for image paths if you want featured images
 
     def __repr__(self):
@@ -63,14 +68,39 @@ class BlogPost(db.Model):
 class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.Text, nullable=False)
+    slug = db.Column(db.String(120), unique=True, nullable=False)
+    description = db.Column(db.String(200), nullable=False) # For short text/summary
+    content = db.Column(db.Text, nullable=False) # For full rich HTML content
     skills_used = db.Column(db.String(200), nullable=True) # e.g., "Zoho CRM, Deluge"
     demo_link = db.Column(db.String(200), nullable=True)
     case_study_link = db.Column(db.String(200), nullable=True)
+    image_file = db.Column(db.String(20), nullable=False, default='default.jpg') # New column for image
     # Add a column for project image paths
 
     def __repr__(self):
         return f"Project('{self.title}')"
+
+def save_picture(form_picture, folder='general_uploads', output_size=(125, 125)):
+   
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+
+    # Define the full path to the specific subfolder
+    target_folder_path = os.path.join(current_app.root_path, current_app.config['UPLOAD_FOLDER'], folder)
+
+    # Create the folder if it doesn't exist
+    os.makedirs(target_folder_path, exist_ok=True)
+
+    picture_path = os.path.join(target_folder_path, picture_fn)
+
+    # Open, resize, and save the image
+    i = Image.open(form_picture)
+    i.thumbnail(output_size) # Resize image
+    i.save(picture_path)
+
+    # Return the relative path from the UPLOAD_FOLDER, including the subfolder
+    return os.path.join(folder, picture_fn).replace('\\', '/')
 
 
 @login_manager.user_loader
@@ -88,10 +118,8 @@ def allowed_file(filename):
 
 # --- Sitemap Generators (FIXED) ---
 @sitemap.register_generator
-def blog_posts_sitemap_generator(): # Renamed function for clarity (optional)
+def blog_posts_sitemap_generator():
     urls = []
-    # Add static pages that need to be in the sitemap here if they are not dynamically generated
-    # Example for static pages (adjust changefreq and priority as needed)
     urls.append({'loc': url_for('home', _external=True), 'changefreq': 'daily', 'priority': 1.0})
     urls.append({'loc': url_for('about', _external=True), 'changefreq': 'monthly', 'priority': 0.6})
     urls.append({'loc': url_for('skills', _external=True), 'changefreq': 'monthly', 'priority': 0.6})
@@ -99,28 +127,27 @@ def blog_posts_sitemap_generator(): # Renamed function for clarity (optional)
     urls.append({'loc': url_for('blog', _external=True), 'changefreq': 'daily', 'priority': 0.9})
     urls.append({'loc': url_for('contact', _external=True), 'changefreq': 'monthly', 'priority': 0.5})
 
-
+    # ... static pages ...
     for post in BlogPost.query.all():
         urls.append({
-            'loc': url_for('blog_post', post_id=post.id, _external=True),
-            'lastmod': post.date_posted.isoformat() + 'Z' if post.date_posted else None, # Add 'Z' for UTC
-            'changefreq': 'weekly', # How often it changes
-            'priority': 0.8 # Importance relative to other pages (0.0 to 1.0)
+            'loc': url_for('blog_post', slug=post.slug, _external=True), # Changed here
+            'lastmod': post.date_posted.isoformat() + 'Z' if post.date_posted else None,
+            'changefreq': 'weekly',
+            'priority': 0.8
         })
     return urls
 
 @sitemap.register_generator
-def projects_sitemap_generator(): # Renamed function for clarity (optional)
+def projects_sitemap_generator():
     urls = []
     for project in Project.query.all():
         urls.append({
-            'loc': url_for('project_detail', project_id=project.id, _external=True),
-            'lastmod': None, # Add a 'last_updated' field to Project model if needed for this
+            'loc': url_for('project_detail', slug=project.slug, _external=True), # Changed here
+            'lastmod': None,
             'changefreq': 'monthly',
             'priority': 0.7
         })
     return urls
-
 
 # --- Routes for Public Pages ---
 @app.route('/')
@@ -144,9 +171,9 @@ def portfolio():
     projects = Project.query.all() # Fetch all projects from DB
     return render_template('portfolio.html', projects=projects, title='My Portfolio')
 
-@app.route('/project/<int:project_id>')
-def project_detail(project_id):
-    project = Project.query.get_or_404(project_id)
+@app.route('/project/<string:slug>')
+def project_detail(slug):
+    project = Project.query.filter_by(slug=slug).first_or_404() # Query by slug
     return render_template('project_detail.html', project=project, title=project.title)
 
 # CORRECTED /blog route - for listing all blog posts with pagination
@@ -159,11 +186,10 @@ def blog():
     return render_template('post.html', blog_posts=blog_posts, title='My Blog')
 
 # For individual blog posts: (corrected template name)
-@app.route('/blog/<int:post_id>')
-def blog_post(post_id):
-    post = BlogPost.query.get_or_404(post_id)
+@app.route('/blog/<string:slug>')
+def blog_post(slug):
+    post = BlogPost.query.filter_by(slug=slug).first_or_404() # Query by slug
     meta_desc = post.content[:160] + '...' if len(post.content) > 160 else post.content
-    # Use 'blog_post.html' for the individual post detail view
     return render_template('blog.html', post=post, title=post.title + ' - Stephen Awili Blog', description=meta_desc)
 
 # RE-ADDED this route, as it was in your navbar/previous code but missing from the traceback snippet
@@ -228,15 +254,29 @@ ALLOWED_ATTRIBUTES = {
 def new_blog_post():
     form = BlogPostForm()
     if form.validate_on_submit():
+        image_file = 'default_blog.jpg'
+        if form.image.data:
+            image_file = save_picture(form.image.data, folder='blog_images', output_size=(800, 600))
+
         clean_content = bleach.clean(form.content.data,
                                      tags=ALLOWED_TAGS,
                                      attributes=ALLOWED_ATTRIBUTES,
                                      strip=True)
-        post = BlogPost(title=form.title.data, content=clean_content)
+
+        # Generate slug
+        base_slug = slugify(form.title.data)
+        slug = base_slug
+        counter = 1
+        # Ensure slug is unique
+        while BlogPost.query.filter_by(slug=slug).first():
+            slug = f"{base_slug}-{counter}"
+            counter += 1
+
+        post = BlogPost(title=form.title.data, slug=slug, content=clean_content, image_file=image_file) # Save the slug
         db.session.add(post)
         db.session.commit()
         flash('Blog post created successfully!', 'success')
-        return redirect(url_for('blog_post', post_id=post.id))
+        return redirect(url_for('blog_post', slug=post.slug)) # Pass slug to URL
     return render_template('admin/blog_post_form.html', title='New Blog Post', form=form, legend='New Blog Post')
 
 @app.route('/admin/blog/<int:post_id>/edit', methods=['GET', 'POST'])
@@ -245,27 +285,45 @@ def edit_blog_post(post_id):
     post = BlogPost.query.get_or_404(post_id)
     form = BlogPostForm()
     if form.validate_on_submit():
-        post.title = form.title.data
+        if form.image.data:
+            if post.image_file != 'default_blog.jpg' and os.path.exists(os.path.join(app.root_path, app.config['UPLOAD_FOLDER'], post.image_file)):
+                os.remove(os.path.join(app.root_path, app.config['UPLOAD_FOLDER'], post.image_file))
+            post.image_file = save_picture(form.image.data, folder='blog_images', output_size=(800, 600))
+
+        # Only regenerate slug if title has changed
+        if post.title != form.title.data:
+            post.title = form.title.data
+            base_slug = slugify(form.title.data)
+            slug = base_slug
+            counter = 1
+            while BlogPost.query.filter_by(slug=slug).first() and slug != post.slug: # Check uniqueness, but allow self
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            post.slug = slug
+
         post.content = bleach.clean(form.content.data,
                                      tags=ALLOWED_TAGS,
                                      attributes=ALLOWED_ATTRIBUTES,
                                      strip=True)
         db.session.commit()
         flash('Blog post updated successfully!', 'success')
-        return redirect(url_for('blog_post', post_id=post.id))
+        return redirect(url_for('blog_post', slug=post.slug)) # Pass slug to URL
     elif request.method == 'GET':
         form.title.data = post.title
         form.content.data = post.content
-    return render_template('admin/blog_post_form.html', title='Edit Blog Post', form=form, legend='Edit Blog Post')
+    return render_template('admin/blog_post_form.html', title='Edit Blog Post', form=form, legend='Edit Blog Post', current_image=post.image_file)
 
 @app.route('/admin/blog/<int:post_id>/delete', methods=['POST'])
 @login_required
 def delete_blog_post(post_id):
-    post = BlogPost.query.get_or_404(post_id)
-    db.session.delete(post)
-    db.session.commit()
-    flash('Blog post deleted successfully!', 'success')
-    return redirect(url_for('admin_dashboard'))
+   post = BlogPost.query.get_or_404(post_id)
+    # Delete associated image file if not default
+   if post.image_file != 'default_blog.jpg' and os.path.exists(os.path.join(app.root_path, app.config['UPLOAD_FOLDER'], post.image_file)):
+        os.remove(os.path.join(app.root_path, app.config['UPLOAD_FOLDER'], post.image_file))
+   db.session.delete(post)
+   db.session.commit()
+   flash('Blog post deleted successfully!', 'success')
+   return redirect(url_for('admin_dashboard'))
 
 # --- Project Management ---
 
@@ -274,17 +332,38 @@ def delete_blog_post(post_id):
 def new_project():
     form = ProjectForm()
     if form.validate_on_submit():
+        image_file = 'default_project.jpg'
+        if form.image.data:
+            image_file = save_picture(form.image.data, folder='project_images', output_size=(600, 400))
+
+        clean_content = bleach.clean(form.content.data,
+                                     tags=ALLOWED_TAGS,
+                                     attributes=ALLOWED_ATTRIBUTES,
+                                     strip=True)
+
+        # Generate slug
+        base_slug = slugify(form.title.data)
+        slug = base_slug
+        counter = 1
+        # Ensure slug is unique
+        while Project.query.filter_by(slug=slug).first():
+            slug = f"{base_slug}-{counter}"
+            counter += 1
+
         project = Project(
             title=form.title.data,
+            slug=slug, # Save the slug
             description=form.description.data,
+            content=clean_content,
             skills_used=form.skills_used.data,
             demo_link=form.demo_link.data,
-            case_study_link=form.case_study_link.data
+            case_study_link=form.case_study_link.data,
+            image_file=image_file
         )
         db.session.add(project)
         db.session.commit()
         flash('Project created successfully!', 'success')
-        return redirect(url_for('project_detail', project_id=project.id))
+        return redirect(url_for('project_detail', slug=project.slug)) # Pass slug to URL
     return render_template('admin/project_form.html', title='New Project', form=form, legend='New Project')
 
 @app.route('/admin/project/<int:project_id>/edit', methods=['GET', 'POST'])
@@ -293,26 +372,46 @@ def edit_project(project_id):
     project = Project.query.get_or_404(project_id)
     form = ProjectForm()
     if form.validate_on_submit():
-        project.title = form.title.data
+        if form.image.data:
+            if project.image_file != 'default_project.jpg' and os.path.exists(os.path.join(app.root_path, app.config['UPLOAD_FOLDER'], project.image_file)):
+                os.remove(os.path.join(app.root_path, app.config['UPLOAD_FOLDER'], project.image_file))
+            project.image_file = save_picture(form.image.data, folder='project_images', output_size=(600, 400))
+
+        # Only regenerate slug if title has changed
+        if project.title != form.title.data:
+            project.title = form.title.data
+            base_slug = slugify(form.title.data)
+            slug = base_slug
+            counter = 1
+            while Project.query.filter_by(slug=slug).first() and slug != project.slug: # Check uniqueness, but allow self
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            project.slug = slug
+
         project.description = form.description.data
+        project.content = bleach.clean(form.content.data, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
         project.skills_used = form.skills_used.data
         project.demo_link = form.demo_link.data
         project.case_study_link = form.case_study_link.data
         db.session.commit()
         flash('Project updated successfully!', 'success')
-        return redirect(url_for('project_detail', project_id=project.id))
+        return redirect(url_for('project_detail', slug=project.slug)) # Pass slug to URL
     elif request.method == 'GET':
         form.title.data = project.title
         form.description.data = project.description
+        form.content.data = project.content
         form.skills_used.data = project.skills_used
         form.demo_link.data = project.demo_link
         form.case_study_link.data = project.case_study_link
-    return render_template('admin/project_form.html', title='Edit Project', form=form, legend='Edit Project')
+    return render_template('admin/project_form.html', title='Edit Project', form=form, legend='Edit Project', current_image=project.image_file)
 
 @app.route('/admin/project/<int:project_id>/delete', methods=['POST'])
 @login_required
 def delete_project(project_id):
     project = Project.query.get_or_404(project_id)
+    # Delete associated image file if not default
+    if project.image_file != 'default_project.jpg' and os.path.exists(os.path.join(app.root_path, app.config['UPLOAD_FOLDER'], project.image_file)):
+        os.remove(os.path.join(app.root_path, app.config['UPLOAD_FOLDER'], project.image_file))
     db.session.delete(project)
     db.session.commit()
     flash('Project deleted successfully!', 'success')
@@ -327,22 +426,32 @@ def upload_image():
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
     if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        unique_filename = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{filename}"
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
-        file.save(filepath)
-
-        image_url = url_for('static', filename=f'uploads/{unique_filename}', _external=True)
-        return jsonify({'location': image_url}), 200
-    return jsonify({'error': 'File type not allowed'}), 400
+        try:
+            # Let's save these generic uploads into a 'general' subfolder
+            image_filename = save_picture(file, folder='general', output_size=(1000, 1000))
+            image_url = url_for('static', filename=f'uploads/{image_filename}', _external=True)
+            return jsonify({'location': image_url}), 200
+        except Exception as e:
+            app.logger.error(f"Error uploading image: {e}")
+            return jsonify({'error': 'Failed to process image'}), 500
+    return jsonify({'error': 'File type not allowed or no file provided'}), 400
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-        if not User.query.filter_by(username='admin').first():
-            admin_user = User(username='admin')
-            admin_user.set_password('adminpassword') # CHANGE THIS PASSWORD IMMEDIATELY!
-            db.session.add(admin_user)
-            db.session.commit()
-            print("Admin user created with username 'admin' and password 'adminpassword'")
+        admin_username = os.getenv('ADMIN_USERNAME')
+        admin_password = os.getenv('ADMIN_PASSWORD')
+        if not User.query.filter_by(username=admin_username).first():
+            if admin_username and admin_password:
+                admin_user = User(username=admin_username)
+                admin_user.set_password(admin_password)
+                db.session.add(admin_user)
+                db.session.commit()
+                print(f"Admin user '{admin_username}' created successfully!")
+            else:
+                print("Warning: ADMIN_USERNAME or ADMIN_PASSWORD not found in .env. Admin user not created.")
+        else:
+            print(f"Admin user '{admin_username}' already exists.")
+
+    app.run(debug=True)
     
