@@ -12,7 +12,7 @@
                 {{ form.title.label(class="block text-gray-700 text-sm font-bold mb-2") }}
                 {{ form.title(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
                 {% for error in form.title.errors %}
-                    <span class="text-red-500 text-xs italic">{{ error }}</span>
+                <span class="text-red-500 text-xs italic">{{ error }}</span>
                 {% endfor %}
             </div>
 
@@ -21,7 +21,7 @@
                 {# The textarea field. TinyMCE will attach to this. #}
                 {{ form.content(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-48", rows="10", id="blog-content-editor") }}
                 {% for error in form.content.errors %}
-                    <span class="text-red-500 text-xs italic">{{ error }}</span>
+                <span class="text-red-500 text-xs italic">{{ error }}</span>
                 {% endfor %}
             </div>
 
@@ -30,16 +30,16 @@
                 {{ form.image.label(class="block text-gray-700 text-sm font-bold mb-2") }}
                 {{ form.image(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
                 {% if form.image.errors %}
-                    {% for error in form.image.errors %}
-                        <span class="text-red-500 text-xs italic">{{ error }}</span><br>
-                    {% endfor %}
+                {% for error in form.image.errors %}
+                <span class="text-red-500 text-xs italic">{{ error }}</span><br>
+                {% endfor %}
                 {% endif %}
                 {# Display current image when editing #}
                 {% if current_image and current_image != 'default_blog.jpg' %}
-                    <p class="text-gray-600 text-sm mt-2">Current Image:</p>
-                    <img src="{{ url_for('static', filename='uploads/' + current_image) }}" class="img-thumbnail mt-2 rounded-md" style="width: 150px; height: 150px; object-fit: cover;">
+                <p class="text-gray-600 text-sm mt-2">Current Image:</p>
+                <img src="{{ url_for('static', filename='uploads/' + current_image) }}" class="img-thumbnail mt-2 rounded-md" style="width: 150px; height: 150px; object-fit: cover;">
                 {% elif current_image and current_image == 'default_blog.jpg' and legend == 'Edit Blog Post' %}
-                    <p class="text-gray-600 text-sm mt-2">No custom image uploaded. Using default.</p>
+                <p class="text-gray-600 text-sm mt-2">No custom image uploaded. Using default.</p>
                 {% endif %}
             </div>
 
@@ -52,6 +52,10 @@
 {% endblock %}
 
 {% block scripts %}
+{{ super() }}
+
+<script src="https://cdn.tiny.cloud/1/s8fcksw29pdzm6ocyxze8notxj126qq5rvbyrid88fmknjmh/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
 <script>
     tinymce.init({
         selector: '#blog-content-editor', // Or #project-content-editor
