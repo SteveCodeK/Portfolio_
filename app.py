@@ -58,7 +58,7 @@ class BlogPost(db.Model):
     content = db.Column(db.Text, nullable=False)
     slug = db.Column(db.String(120), unique=True, nullable=False)
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    image_file = db.Column(db.String(20), nullable=False, default='default.jpg') # New column for image
+    image_file = db.Column(db.String(100), nullable=False, default='default.jpg') # New column for image
     # Add a column for image paths if you want featured images
 
     def __repr__(self):
@@ -74,7 +74,7 @@ class Project(db.Model):
     skills_used = db.Column(db.String(200), nullable=True) # e.g., "Zoho CRM, Deluge"
     demo_link = db.Column(db.String(200), nullable=True)
     case_study_link = db.Column(db.String(200), nullable=True)
-    image_file = db.Column(db.String(20), nullable=False, default='default.jpg') # New column for image
+    image_file = db.Column(db.String(100), nullable=False, default='default.jpg') # New column for image
     # Add a column for project image paths
 
     def __repr__(self):

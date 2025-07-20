@@ -7,4 +7,4 @@ Disallow: /admin/
 Disallow: /login/
 Disallow: /register/ # If you have one and don't want it indexed
 
-Sitemap: https://www.yourdomain.com/sitemap.xml # Link to your sitemap!
+Sitemap: https://www.awilisteve.co.ke/sitemap.xml # Link to your sitemap!
