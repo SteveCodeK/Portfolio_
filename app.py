@@ -118,36 +118,35 @@ def allowed_file(filename):
 
 # --- Sitemap Generators (FIXED) ---
 @sitemap.register_generator
-def blog_posts_sitemap_generator():
-    urls = []
-    urls.append({'loc': url_for('home', _external=True), 'changefreq': 'daily', 'priority': 1.0})
-    urls.append({'loc': url_for('about', _external=True), 'changefreq': 'monthly', 'priority': 0.6})
-    urls.append({'loc': url_for('skills', _external=True), 'changefreq': 'monthly', 'priority': 0.6})
-    urls.append({'loc': url_for('portfolio', _external=True), 'changefreq': 'weekly', 'priority': 0.9})
-    urls.append({'loc': url_for('blog', _external=True), 'changefreq': 'daily', 'priority': 0.9})
-    urls.append({'loc': url_for('contact', _external=True), 'changefreq': 'monthly', 'priority': 0.5})
+def my_sitemap_generator(): # You can combine them or keep separate, but the format changes
+    # Static pages
+    yield 'home', {'changefreq': 'daily', 'priority': 1.0}
+    yield 'about', {'changefreq': 'monthly', 'priority': 0.6}
+    yield 'skills', {'changefreq': 'monthly', 'priority': 0.6}
+    yield 'portfolio', {'changefreq': 'weekly', 'priority': 0.9}
+    yield 'blog', {'changefreq': 'daily', 'priority': 0.9}
+    yield 'contact', {'changefreq': 'monthly', 'priority': 0.5}
 
-    # ... static pages ...
+    # Blog posts
     for post in BlogPost.query.all():
-        urls.append({
-            'loc': url_for('blog_post', slug=post.slug, _external=True), # Changed here
+        yield 'blog_post', {
+            'slug': post.slug, # Pass slug as an argument
             'lastmod': post.date_posted.isoformat() + 'Z' if post.date_posted else None,
             'changefreq': 'weekly',
             'priority': 0.8
-        })
-    return urls
+        }
 
-@sitemap.register_generator
-def projects_sitemap_generator():
-    urls = []
+    # Projects
     for project in Project.query.all():
-        urls.append({
-            'loc': url_for('project_detail', slug=project.slug, _external=True), # Changed here
-            'lastmod': None,
+        # Assuming Project has a date_posted field
+        last_mod_date = project.date_posted.isoformat() + 'Z' if hasattr(project, 'date_posted') and project.date_posted else None
+        yield 'project_detail', {
+            'slug': project.slug, # Pass slug as an argument
+            'lastmod': last_mod_date,
             'changefreq': 'monthly',
             'priority': 0.7
-        })
-    return urls
+        }
+
 
 # --- Routes for Public Pages ---
 @app.route('/')
