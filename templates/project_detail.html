@@ -16,6 +16,10 @@
             {# Use project.content here, and always apply |safe for HTML content #}
             {{ project.description | safe }}
         </div>
+        <div class="prose max-w-none text-gray-700 leading-relaxed text-lg mb-8">
+            {# Use project.content here, and always apply |safe for HTML content #}
+            {{ project.content | safe }}
+        </div>
 
         {% if project.skills_used %}
         <div class="mb-6">
