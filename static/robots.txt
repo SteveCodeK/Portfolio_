@@ -3,8 +3,7 @@ User-agent: *
 Allow: /
 
 # Disallow admin areas
-Disallow: /admin/
-Disallow: /login/
-Disallow: /register/ # If you have one and don't want it indexed
+Disallow: /admin
+Disallow: /login
 
 Sitemap: https://www.awilisteve.co.ke/sitemap.xml # Link to your sitemap!
