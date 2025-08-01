@@ -563,4 +563,4 @@ if __name__ == '__main__':
         else:
             print(f"Admin user '{admin_username}' already exists.")
 
-    app.run(debug=True) # Run with debug=True for development
+    #app.run(debug=True) # Run with debug=True for development
