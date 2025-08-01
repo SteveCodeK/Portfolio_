@@ -35,9 +35,9 @@
                 {% endfor %}
                 {% endif %}
                 {# Display current image when editing #}
-                {% if current_image and current_image != 'default_blog.jpg' %}
-                <p class="text-gray-600 text-sm mt-2">Current Image:</p>
-                <img src="{{ url_for('static', filename='uploads/' + current_image) }}" class="img-thumbnail mt-2 rounded-md" style="width: 150px; height: 150px; object-fit: cover;">
+                {% if current_image_id %}
+                <p>Current Image:</p>
+                <img src="{{ url_for('get_image', model_name=model_name, image_id=current_image_id) }}" alt="Current Image" style="max-width: 200px;">
                 {% elif current_image and current_image == 'default_blog.jpg' and legend == 'Edit Blog Post' %}
                 <p class="text-gray-600 text-sm mt-2">No custom image uploaded. Using default.</p>
                 {% endif %}
@@ -58,51 +58,59 @@
 
 <script>
     tinymce.init({
-        selector: '#blog-content-editor', // Or #project-content-editor
-        // ... other configurations ...
+        selector: '#blog-content-editor', // Ensure this matches your textarea ID
+        plugins: 'image code', // ONLY 'image' and 'code' for now
+        toolbar: 'undo redo | image code', // ONLY these buttons
 
+        // --- CRUCIAL URL HANDLING OPTIONS ---
+        relative_urls: false,
+        remove_script_host: false,
+        document_base_url: 'http://127.0.0.1:5000/',
+        convert_urls: false,
+
+        // --- IMAGE UPLOAD HANDLER ---
         automatic_uploads: true,
         file_picker_types: 'image',
-        images_upload_url: '{{ url_for("upload_image") }}', // Crucial: Your Flask endpoint
-
-        // This is the handler that's throwing the error
+        images_upload_url: '{{ url_for("upload_image") }}',
         images_upload_handler: function (blobInfo, success, failure) {
             var xhr, formData;
-
             xhr = new XMLHttpRequest();
-            xhr.withCredentials = false; // Important if you have CORS issues, but generally false for same-origin
-            xhr.open('POST', '{{ url_for("upload_image") }}'); // Match this with images_upload_url
+            xhr.withCredentials = false;
+            xhr.open('POST', '{{ url_for("upload_image") }}');
 
             xhr.onload = function() {
                 var json;
-
-                if (xhr.status != 200) {
-                    failure('HTTP Error: ' + xhr.status);
+                if (xhr.status === 403) {
+                    failure('HTTP Error: ' + xhr.status + ': Your session may have expired. Please log in again.');
                     return;
                 }
-
-                try { // Add a try-catch for JSON parsing errors
+                if (xhr.status < 200 || xhr.status >= 300) {
+                    failure('HTTP Error: ' + xhr.status + ': ' + xhr.responseText);
+                    return;
+                }
+                try {
                     json = JSON.parse(xhr.responseText);
                 } catch (e) {
-                    failure('Failed to parse JSON response: ' + e.message);
+                    failure('Failed to parse JSON response: ' + e.message + ' Response: ' + xhr.responseText);
                     return;
                 }
-
-                // Make sure your Flask endpoint returns a JSON with a 'location' key
-                if (!json || typeof json.location != 'string') {
+                if (!json || typeof json.location !== 'string') {
                     failure('Invalid JSON response: ' + xhr.responseText);
                     return;
                 }
-
-                success(json.location); // This is where TinyMCE gets the image URL
+                console.log("TinyMCE images_upload_handler success. Location provided:", json.location); // Keep this log
+                success(json.location); // This is where the successful URL is passed to TinyMCE
             };
 
-            xhr.onerror = function () { // Add an error handler for network issues
-                failure('Image upload failed due. Network error or server issues.');
+            xhr.onerror = function () {
+                failure('Image upload failed. Network error or server issues.');
             };
 
             formData = new FormData();
-            formData.append('file', blobInfo.blob(), blobInfo.filename()); // 'file' must match Flask's request.files key
+            formData.append('file', blobInfo.blob(), blobInfo.filename());
+
+            var csrf_token = document.querySelector('input[name="csrf_token"]').value;
+            formData.append('csrf_token', csrf_token);
 
             xhr.send(formData);
         }

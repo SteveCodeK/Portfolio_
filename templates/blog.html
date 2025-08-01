@@ -12,7 +12,7 @@
 
         {# Display Featured Image for Blog Post #}
         <div class="mb-8 text-center">
-            <img src="{{ url_for('static', filename='uploads/' + post.image_file) }}" alt="{{ post.title }}" class="w-full h-auto max-h-96 object-cover rounded-lg shadow-md mx-auto">
+            <img src="{{ url_for('get_image', model_name='blog', image_id=post.id) }}" alt="{{ post.title }}" class="w-full h-auto max-h-96 object-cover rounded-lg shadow-md mx-auto">
         </div>
 
         <div class="prose max-w-none text-gray-700 leading-relaxed text-lg">

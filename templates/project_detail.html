@@ -9,7 +9,7 @@
 
         {# Display Project Image #}
         <div class="mb-8 text-center">
-            <img src="{{ url_for('static', filename='uploads/' + project.image_file) }}" alt="{{ project.title }}" class="w-full h-auto rounded-lg shadow-md max-w-xl mx-auto object-cover">
+            <img src="{{ url_for('get_image', model_name='project', image_id=project.id) }}" alt="{{ project.title }}" class="w-full h-auto rounded-lg shadow-md max-w-xl mx-auto object-cover">
         </div>
 
         <div class="prose max-w-none text-gray-700 leading-relaxed text-lg mb-8">

@@ -9,7 +9,7 @@
         {% for post in blog_posts.items %}
         <div class="bg-white rounded-lg shadow-md overflow-hidden transform transition-transform duration-300 hover:scale-105">
             {# Display Blog Post Image #}
-            <img src="{{ url_for('static', filename='uploads/' + post.image_file) }}" alt="{{ post.title }}" class="w-full h-48 object-cover">
+            <img src="{{ url_for('get_image', model_name='blog', image_id=post.id) }}" alt="{{ post.title }}" class="w-full h-48 object-cover">
             <div class="p-6">
                 <h2 class="text-2xl font-semibold text-gray-900 mb-2">{{ post.title }}</h2>
                 <p class="text-gray-600 text-sm mb-4">Published on {{ post.date_posted.strftime('%B %d, %Y') }}</p>

@@ -65,9 +65,9 @@
                 {% endfor %}
                 {% endif %}
                 {# Display current image when editing #}
-                {% if current_image and current_image != 'default_project.jpg' %}
-                <p class="text-gray-600 text-sm mt-2">Current Image:</p>
-                <img src="{{ url_for('static', filename='uploads/' + current_image) }}" class="img-thumbnail mt-2 rounded-md" style="width: 150px; height: 150px; object-fit: cover;">
+                {% if current_image_id %}
+                <p>Current Image:</p>
+                <img src="{{ url_for('get_image', model_name=model_name, image_id=current_image_id) }}" alt="Current Image" style="max-width: 200px;">
                 {% elif current_image and current_image == 'default_project.jpg' and legend == 'Edit Project' %}
                 <p class="text-gray-600 text-sm mt-2">No custom image uploaded. Using default.</p>
                 {% endif %}
@@ -85,57 +85,68 @@
 {{ super() }}
 
 <script src="https://cdn.tiny.cloud/1/s8fcksw29pdzm6ocyxze8notxj126qq5rvbyrid88fmknjmh/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-
 <script>
     tinymce.init({
-        selector: '#project-content-editor', // Or #project-content-editor
-        // ... other configurations ...
+        selector: '#blog-content-editor', // Or '#project-content-editor' for projects
+        plugins: 'advlist autolink lists link image charmap anchor searchreplace visualblocks code fullscreen insertdatetime media table code help wordcount',
+        toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | link image | code | help',
 
-        automatic_uploads: true,
-        file_picker_types: 'image',
-        images_upload_url: '{{ url_for("upload_image") }}', // Crucial: Your Flask endpoint
+        // --- THESE ARE CRUCIAL FOR URL HANDLING ---
+        relative_urls: false,
+        remove_script_host: false,
+        document_base_url: 'http://127.0.0.1:5000/', // IMPORTANT: Match your Flask app's base URL
+        convert_urls: false, // Added last time, keep this
 
-        // This is the handler that's throwing the error
+        // --- IMAGE UPLOAD SPECIFIC ---
+        automatic_uploads: true, // Enables automatic upload when dropping/pasting
+        file_picker_types: 'image', // Ensures the file picker dialog includes image types
+        images_upload_url: '{{ url_for("upload_image") }}', // Flask endpoint for handling uploads
         images_upload_handler: function (blobInfo, success, failure) {
             var xhr, formData;
-
             xhr = new XMLHttpRequest();
-            xhr.withCredentials = false; // Important if you have CORS issues, but generally false for same-origin
-            xhr.open('POST', '{{ url_for("upload_image") }}'); // Match this with images_upload_url
+            xhr.withCredentials = false; // Set to true if your Flask app uses sessions/cookies for auth across domains (unlikely on 127.0.0.1)
+            xhr.open('POST', '{{ url_for("upload_image") }}');
 
-            xhr.onload = function() {
+            xhr.onload = function () {
                 var json;
-
-                if (xhr.status != 200) {
-                    failure('HTTP Error: ' + xhr.status);
+                if (xhr.status === 403) {
+                    failure('HTTP Error: ' + xhr.status + ': Your session may have expired. Please log in again.');
                     return;
                 }
-
-                try { // Add a try-catch for JSON parsing errors
+                if (xhr.status < 200 || xhr.status >= 300) {
+                    failure('HTTP Error: ' + xhr.status + ': ' + xhr.responseText);
+                    return;
+                }
+                try {
                     json = JSON.parse(xhr.responseText);
                 } catch (e) {
-                    failure('Failed to parse JSON response: ' + e.message);
+                    failure('Failed to parse JSON response: ' + e.message + ' Response: ' + xhr.responseText);
                     return;
                 }
-
-                // Make sure your Flask endpoint returns a JSON with a 'location' key
-                if (!json || typeof json.location != 'string') {
+                if (!json || typeof json.location !== 'string') { // Changed != to !== for strict comparison
                     failure('Invalid JSON response: ' + xhr.responseText);
                     return;
                 }
-
-                success(json.location); // This is where TinyMCE gets the image URL
+                // THIS IS THE MOMENT OF TRUTH
+                console.log("Image uploaded successfully. TinyMCE will now try to insert:", json.location); // Keep this log!
+                success(json.location);
             };
 
-            xhr.onerror = function () { // Add an error handler for network issues
-                failure('Image upload failed due. Network error or server issues.');
+            xhr.onerror = function () {
+                failure('Image upload failed. Network error or server issues.');
             };
 
             formData = new FormData();
-            formData.append('file', blobInfo.blob(), blobInfo.filename()); // 'file' must match Flask's request.files key
+            formData.append('file', blobInfo.blob(), blobInfo.filename());
+
+            // Add CSRF token for security if your Flask app uses it for AJAX requests
+            // You'll need to get the CSRF token from your form's hidden_tag()
+            var csrf_token = document.querySelector('input[name="csrf_token"]').value;
+            formData.append('csrf_token', csrf_token);
 
             xhr.send(formData);
-        }
+        },
+        // Optional: images_file_types: 'jpeg,jpg,png,gif', // Restrict accepted file types in the dialog
     });
 </script>
 {% endblock %}

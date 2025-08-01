@@ -1,8 +1,8 @@
-"""Add slug column to BlogPost and Project
+"""Add image data and mimetype to BlogPost and Project models
 
-Revision ID: 58e69871f362
+Revision ID: 430bfab0ead4
 Revises: 
-Create Date: 2025-07-18 11:55:12.513797
+Create Date: 2025-07-28 16:18:45.441075
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '58e69871f362'
+revision = '430bfab0ead4'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -24,7 +24,9 @@ def upgrade():
     sa.Column('content', sa.Text(), nullable=False),
     sa.Column('slug', sa.String(length=120), nullable=False),
     sa.Column('date_posted', sa.DateTime(), nullable=False),
-    sa.Column('image_file', sa.String(length=20), nullable=False),
+    sa.Column('image_filename', sa.String(length=100), nullable=False),
+    sa.Column('image_data', sa.LargeBinary(), nullable=True),
+    sa.Column('image_mimetype', sa.String(length=100), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('slug')
     )
@@ -37,7 +39,10 @@ def upgrade():
     sa.Column('skills_used', sa.String(length=200), nullable=True),
     sa.Column('demo_link', sa.String(length=200), nullable=True),
     sa.Column('case_study_link', sa.String(length=200), nullable=True),
-    sa.Column('image_file', sa.String(length=20), nullable=False),
+    sa.Column('image_filename', sa.String(length=100), nullable=False),
+    sa.Column('image_data', sa.LargeBinary(), nullable=True),
+    sa.Column('image_mimetype', sa.String(length=100), nullable=True),
+    sa.Column('date_posted', sa.DateTime(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('slug')
     )
