@@ -151,11 +151,8 @@ def allowed_file(filename):
 @sitemap.register_generator
 def my_sitemap_generator():
     yield 'home', {'changefreq': 'daily', 'priority': 1.0}
-    yield 'about', {'changefreq': 'monthly', 'priority': 0.6}
-    yield 'skills', {'changefreq': 'monthly', 'priority': 0.6}
     yield 'portfolio', {'changefreq': 'weekly', 'priority': 0.9}
     yield 'blog', {'changefreq': 'daily', 'priority': 0.9}
-    yield 'contact', {'changefreq': 'monthly', 'priority': 0.5}
 
     for post in BlogPost.query.all():
         yield 'blog_post', {
