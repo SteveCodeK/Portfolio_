@@ -6,6 +6,7 @@ from extension import db
 dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/admin")
 
 @dashboard_bp.route("/dashboard")
+@dashboard_bp.route("/")
 @login_required
 def admin_dashboard():
     stats = {
