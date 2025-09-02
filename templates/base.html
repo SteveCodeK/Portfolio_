@@ -68,9 +68,9 @@ Best Zoho CRM consultant near me, Build fleet management app Zoho, Automate busi
                 <a href="{{ url_for('portfolio') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">Portfolio</a>
                 <a href="{{ url_for('blog') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">Blog</a>
                 <a href="{{ url_for('home') }}#contact" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">Contact</a>
-
+                
                 {% if current_user.is_authenticated %}
-                <a href="{{ url_for('admin_dashboard') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">Admin</a>
+                <a href="{{ url_for('dashboard.admin_dashboard') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">Admin</a>
                 <a href="{{ url_for('logout') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">Logout</a>
                 {% endif %}
             </div>
@@ -84,7 +84,7 @@ Best Zoho CRM consultant near me, Build fleet management app Zoho, Automate busi
             <a href="{{ url_for('home') }}#contact" class="nav-link text-gray-600 hover:text-blue-700 transition-colors w-full text-center py-2 rounded-md hover:bg-blue-50">Contact</a>
 
             {% if current_user.is_authenticated %}
-            <a href="{{ url_for('admin_dashboard') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors w-full text-center py-2 rounded-md hover:bg-blue-50">Admin</a>
+            <a href="{{ url_for('dashboard.admin_dashboard') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors w-full text-center py-2 rounded-md hover:bg-blue-50">Admin</a>
             <a href="{{ url_for('logout') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors w-full text-center py-2 rounded-md hover:bg-blue-50">Logout</a>
             {% endif %}
         </div>

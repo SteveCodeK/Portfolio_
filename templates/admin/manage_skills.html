@@ -1,0 +1,29 @@
+{% extends "admin/admin.html" %}
+
+{% block admin_content %}
+<div class="max-w-5xl mx-auto mt-10">
+    <h1 class="text-3xl font-bold text-blue-600 mb-6">Skills</h1>
+    <a href="{{ url_for('add_skill') }}" class="bg-blue-600 text-white px-4 py-2 rounded-md">+ Add Skill</a>
+    <table class="w-full mt-6 bg-white shadow-md rounded-lg">
+        <thead class="bg-blue-100">
+            <tr>
+                <th class="py-2 px-4">Name</th>
+                <th class="py-2 px-4">Description</th>
+                <th class="py-2 px-4">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for skill in skills %}
+            <tr class="border-b">
+                <td class="py-2 px-4">{{ skill.name }}</td>
+                <td class="py-2 px-4">{{ skill.description }}</td>
+                <td class="py-2 px-4 space-x-2">
+                    <a href="{{ url_for('edit_skill', skill_id=skill.id) }}" class="text-blue-600">Edit</a>
+                    <a href="{{ url_for('delete_skill', skill_id=skill.id) }}" class="text-red-600">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

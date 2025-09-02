@@ -3,8 +3,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+from form import BlogPostForm, ProjectForm, LoginForm, CommentForm, SkillForm, SubSkillForm
+from model import Project, BlogPost, User, UploadedImage, Comment, Like, Rating, Skill, SubSkill
+from extension import db
 from flask_migrate import Migrate
-from form import BlogPostForm, ProjectForm, LoginForm
 import bleach
 from flask_sitemap import Sitemap
 import os
@@ -16,6 +18,8 @@ from dotenv import load_dotenv
 import io # Import io for BytesIO
 from sqlalchemy import inspect # Import inspect for proper table existence check
 from bleach.css_sanitizer import CSSSanitizer
+from cms_dashboard import dashboard_bp
+
 
 load_dotenv()
 
@@ -30,7 +34,7 @@ sitemap = Sitemap(app=app)
 app.config['SITEMAP_URL_SCHEME'] = 'https'
 app.config['SITEMAP_GENERATOR_OPTIONS'] = {'base_url': os.environ.get('SITEMAP_BASE_URL')}
 
-db = SQLAlchemy(app)
+db.init_app(app)   # initialize db with app
 migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -40,60 +44,8 @@ css_sanitizer = CSSSanitizer(
     allowed_css_properties=['color', 'font-size', 'text-align', 'width', 'height', 'max-width', 'max-height', 'margin', 'padding', 'border'] # Add properties you want to allow
 )
 
-# --- SQLAlchemy Models (DEFINED AT THE TOP LEVEL) ---
-class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), unique=True, nullable=False)
-    password_hash = db.Column(db.String(658), nullable=False)
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-
-    def __repr__(self):
-        return f"User('{self.username}')"
-
-class BlogPost(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
-    content = db.Column(db.Text, nullable=False)
-    slug = db.Column(db.String(120), unique=True, nullable=False)
-    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    image_filename = db.Column(db.String(100), nullable=False, default='default.jpg')
-    image_data = db.Column(db.LargeBinary, nullable=True)
-    image_mimetype = db.Column(db.String(50), nullable=True)
-
-    def __repr__(self):
-        return f"BlogPost('{self.title}', '{self.date_posted}')"
-
-class Project(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
-    slug = db.Column(db.String(120), unique=True, nullable=False)
-    description = db.Column(db.String(200), nullable=False)
-    content = db.Column(db.Text, nullable=False)
-    skills_used = db.Column(db.String(200), nullable=True)
-    demo_link = db.Column(db.String(200), nullable=True)
-    case_study_link = db.Column(db.String(200), nullable=True)
-    image_filename = db.Column(db.String(100), nullable=False, default='default.jpg')
-    image_data = db.Column(db.LargeBinary, nullable=True)
-    image_mimetype = db.Column(db.String(50), nullable=True)
-    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-
-    def __repr__(self):
-        return f"Project('{self.title}')"
-
-# NEW: Define UploadedImage model at the top level
-class UploadedImage(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    filename = db.Column(db.String(255))
-    data = db.Column(db.LargeBinary)
-    mimetype = db.Column(db.String(50))
-
-    def __repr__(self):
-        return f"UploadedImage('{self.filename}')"
+# Register the dashboard blueprint
+app.register_blueprint(dashboard_bp)
 
 # --- Helper Function for Image Saving ---
 def save_image_to_db(form_picture, output_size=None):
@@ -226,25 +178,75 @@ def get_image(model_name, image_id):
 def home():
     latest_blogs = BlogPost.query.order_by(BlogPost.date_posted.desc()).limit(3).all()
     latest_projects = Project.query.order_by(Project.id.desc()).limit(3).all()
-    return render_template('index.html', latest_blogs=latest_blogs, latest_projects=latest_projects)
+    skills = Skill.query.all()
+    return render_template('index.html', latest_blogs=latest_blogs, latest_projects=latest_projects, skills=skills)
 
 @app.route('/about')
 def about():
     return render_template('about.html', title='About Me')
 
-@app.route('/skills')
-def skills():
-    return render_template('skills.html', title='My Skills')
+
+
+@app.route("/portfolio/skill/<int:skill_id>")
+def portfolio_by_skill(skill_id):
+    skill = Skill.query.get_or_404(skill_id)
+    # Get projects linked via subskills
+    projects = Project.query.join(Project.subskills).join(SubSkill.skill).filter(Skill.id == skill_id).all()
+    return render_template("portfolio.html", projects=projects, filter_type="skill", filter_name=skill.name)
+
+
+@app.route("/portfolio/subskill/<int:subskill_id>")
+def portfolio_by_subskill(subskill_id):
+    subskill = SubSkill.query.get_or_404(subskill_id)
+    projects = subskill.projects  # direct relationship
+    return render_template("portfolio.html", projects=projects, filter_type="subskill", filter_name=subskill.name)
 
 @app.route('/portfolio')
 def portfolio():
     projects = Project.query.all()
     return render_template('portfolio.html', projects=projects, title='My Portfolio')
 
-@app.route('/project/<string:slug>')
+
+@app.route('/project/<string:slug>', methods=["GET", "POST"])
 def project_detail(slug):
     project = Project.query.filter_by(slug=slug).first_or_404()
-    return render_template('project_detail.html', project=project, title=project.title)
+    form = CommentForm()
+
+    if form.validate_on_submit():
+        # Handle Like separately
+        if form.like.data == "true":
+            like = Like(
+                guest_name=form.guest_name.data if not current_user.is_authenticated else None,
+                guest_email=form.guest_email.data if not current_user.is_authenticated else None,
+                project_id=project.id   
+            )
+            db.session.add(like)
+
+        # Handle Comment & Rating
+        if form.content.data or form.rating.data:
+            comment = Comment(
+                content=form.content.data,
+                guest_name=form.guest_name.data if not current_user.is_authenticated else None,
+                guest_email=form.guest_email.data if not current_user.is_authenticated else None,
+                project_id=project.id   
+            )
+            db.session.add(comment)
+
+            if form.rating.data:
+                rating = Rating(
+                    score=form.rating.data,
+                    guest_name=form.guest_name.data if not current_user.is_authenticated else None,
+                    guest_email=form.guest_email.data if not current_user.is_authenticated else None,
+                    project_id=project.id   
+                )
+                db.session.add(rating)
+
+        db.session.commit()
+        flash("Your feedback has been submitted!", "success")
+        return redirect(url_for("project_detail", slug=slug))
+
+    return render_template("project_detail.html", project=project, form=form, title=project.title)
+
 
 @app.route('/blog')
 def blog():
@@ -252,11 +254,46 @@ def blog():
     blog_posts = BlogPost.query.order_by(BlogPost.date_posted.desc()).paginate(page=page, per_page=5, error_out=False)
     return render_template('post.html', blog_posts=blog_posts, title='My Blog')
 
-@app.route('/blog/<string:slug>')
+@app.route('/blog/<string:slug>', methods=["GET", "POST"])
 def blog_post(slug):
     post = BlogPost.query.filter_by(slug=slug).first_or_404()
-    meta_desc = post.content[:160] + '...' if len(post.content) > 160 else post.content
-    return render_template('blog.html', post=post, title=post.title + ' - Stephen Awili Blog', description=meta_desc)
+    form = CommentForm()
+
+    if form.validate_on_submit():
+        # Handle Like separately
+        if form.like.data == "true":
+            like = Like(
+                guest_name=form.guest_name.data if not current_user.is_authenticated else None,
+                guest_email=form.guest_email.data if not current_user.is_authenticated else None,
+                post_id=post.id   
+            )
+            db.session.add(like)
+
+        # Handle Comment & Rating
+        if form.content.data or form.rating.data:
+            comment = Comment(
+                content=form.content.data,
+                guest_name=form.guest_name.data if not current_user.is_authenticated else None,
+                guest_email=form.guest_email.data if not current_user.is_authenticated else None,
+                post_id=post.id  
+            )
+            db.session.add(comment)
+
+            if form.rating.data:
+                rating = Rating(
+                    score=form.rating.data,
+                    guest_name=form.guest_name.data if not current_user.is_authenticated else None,
+                    guest_email=form.guest_email.data if not current_user.is_authenticated else None,
+                    post_id=post.id   
+                )
+                db.session.add(rating)
+
+        db.session.commit()
+        flash("Your feedback has been submitted!", "success")
+        return redirect(url_for("blog_post", slug=slug))
+
+    return render_template("blog.html", post=post, form=form, title=post.title)
+
 
 @app.route('/contact')
 def contact():
@@ -289,16 +326,46 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('home'))
 
-@app.route('/admin')
+
+
+@app.route('/admin/manage-blog')
 @login_required
-def admin_dashboard():
+def manage_blog():
     form = LoginForm()
     blog_posts = BlogPost.query.order_by(BlogPost.date_posted.desc()).all()
-    projects = Project.query.order_by(Project.id.desc()).all()
-    return render_template('admin/admin.html',
-                           title='Admin Dashboard',
+    return render_template('admin/manage_blog.html',
+                           title='Manage BlogPost',
                            blog_posts=blog_posts,
+                           form=form)
+
+@app.route('/admin/manage-project')
+@login_required
+def manage_projects():
+    form = LoginForm()
+    projects = Project.query.order_by(Project.id.desc()).all()
+    return render_template('admin/manage_project.html',
+                           title='Manage Project',
                            projects=projects,
+                           form=form)
+
+@app.route('/admin/users')
+@login_required
+def manage_users():
+    form = LoginForm()
+    user = User.query.order_by(User.id.desc()).all()
+    return render_template('admin/manage_users.html',
+                           title='Users',
+                           user=user,
+                           form=form)
+
+@app.route('/admin/skills')
+@login_required
+def manage_skills():
+    form = SkillForm()
+    skills = Skill.query.order_by(Skill.id.desc()).all()  # <-- Add this
+    return render_template('admin/manage_skills.html',
+                           title='Skills',
+                           skills=skills,
                            form=form)
 
 # --- Blog Post Management ---
@@ -311,6 +378,88 @@ ALLOWED_ATTRIBUTES = {
     'th': ['colspan', 'rowspan'],
     '*': ['class', 'style'],
 }
+
+# --------------------
+# SKILLS CRUD
+# --------------------
+
+@app.route("/admin/skill/add", methods=["GET", "POST"])
+def add_skill():
+    form = SkillForm()
+    if form.validate_on_submit():
+        skill = Skill(name=form.name.data, description=form.description.data)
+        db.session.add(skill)
+        db.session.commit()
+        flash("Skill added successfully!", "success")
+        return redirect(url_for("manage_skills"))
+    return render_template("admin/skill_form.html", form=form, title="Add Skill")
+
+@app.route("/admin/skill/edit/<int:skill_id>", methods=["GET", "POST"])
+def edit_skill(skill_id):
+    skill = Skill.query.get_or_404(skill_id)
+    form = SkillForm(obj=skill)
+    if form.validate_on_submit():
+        skill.name = form.name.data
+        skill.description = form.description.data
+        db.session.commit()
+        flash("Skill updated successfully!", "success")
+        return redirect(url_for("manage_skills"))
+    return render_template("admin/skill_form.html", form=form, title="Edit Skill")
+
+@app.route("/admin/skill/delete/<int:skill_id>")
+def delete_skill(skill_id):
+    skill = Skill.query.get_or_404(skill_id)
+    db.session.delete(skill)
+    db.session.commit()
+    flash("Skill deleted.", "danger")
+    return redirect(url_for("manage_skills"))
+
+
+# --------------------
+# SUBSKILLS CRUD
+# --------------------
+@app.route("/admin/subskills")
+def manage_subskills():
+    form = SubSkillForm()
+    subskills = SubSkill.query.all()
+    return render_template("admin/manage_subskills.html", subskills=subskills)
+
+@app.route("/admin/subskill/add", methods=["GET", "POST"])
+def add_subskill():
+    form = SubSkillForm()
+    form.skill_id.choices = [(s.id, s.name) for s in Skill.query.all()]
+    if form.validate_on_submit():
+        subskill = SubSkill(
+            name=form.name.data,
+            skill_id=form.skill_id.data,
+        )
+        db.session.add(subskill)
+        db.session.commit()
+        flash("SubSkill added successfully!", "success")
+        return redirect(url_for("manage_subskills"))
+    return render_template("admin/subskill_form.html", form=form, title="Add SubSkill")
+
+@app.route("/admin/subskill/edit/<int:subskill_id>", methods=["GET", "POST"])
+def edit_subskill(subskill_id):
+    subskill = SubSkill.query.get_or_404(subskill_id)
+    form = SubSkillForm(obj=subskill)
+    form.skill_id.choices = [(s.id, s.name) for s in Skill.query.all()]
+    if form.validate_on_submit():
+        subskill.name = form.name.data
+        subskill.skill_id = form.skill_id.data
+        db.session.commit()
+        flash("SubSkill updated successfully!", "success")
+        return redirect(url_for("manage_subskills"))
+    return render_template("admin/subskill_form.html", form=form, title="Edit SubSkill")
+
+@app.route("/admin/subskill/delete/<int:subskill_id>")
+def delete_subskill(subskill_id):
+    subskill = SubSkill.query.get_or_404(subskill_id)
+    db.session.delete(subskill)
+    db.session.commit()
+    flash("SubSkill deleted.", "danger")
+    return redirect(url_for("manage_subskills"))
+
 
 @app.route('/admin/blog/new', methods=['GET', 'POST'])
 @login_required
@@ -398,7 +547,7 @@ def delete_blog_post(post_id):
     db.session.delete(post)
     db.session.commit()
     flash('Blog post deleted successfully!', 'success')
-    return redirect(url_for('admin_dashboard'))
+    return redirect(url_for('manage_blog'))
 
 # --- Project Management (unchanged logic, only model definition moved) ---
 @app.route('/admin/project/new', methods=['GET', 'POST'])
@@ -434,12 +583,16 @@ def new_project():
             description=form.description.data,
             content=clean_content,
             skills_used=form.skills_used.data,
+            subskills=form.subskills.data,
             demo_link=form.demo_link.data,
             case_study_link=form.case_study_link.data,
             image_filename=image_filename,
             image_data=image_data,
             image_mimetype=image_mimetype
-        )
+            )
+            
+        
+        project.subskills = form.subskills.data 
         db.session.add(project)
         db.session.commit()
         flash('Project created successfully!', 'success')
@@ -467,6 +620,7 @@ def edit_project(project_id):
         if project.title != form.title.data:
             project.title = form.title.data
             base_slug = slugify(form.title.data)
+            project.subskills = form.subskills.data
             slug = base_slug
             counter = 1
             while Project.query.filter_by(slug=slug).first() and slug != project.slug:
@@ -477,6 +631,7 @@ def edit_project(project_id):
         project.description = form.description.data
         project.content = bleach.clean(form.content.data, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES, css_sanitizer=css_sanitizer, strip=True)
         project.skills_used = form.skills_used.data
+        project.subskills = form.subskills.data
         project.demo_link = form.demo_link.data
         project.case_study_link = form.case_study_link.data
         db.session.commit()
@@ -487,6 +642,7 @@ def edit_project(project_id):
         form.description.data = project.description
         form.content.data = project.content
         form.skills_used.data = project.skills_used
+        form.subskills.data = project.subskills
         form.demo_link.data = project.demo_link
         form.case_study_link.data = project.case_study_link
     return render_template('admin/project_form.html', title='Edit Project', form=form, legend='Edit Project', current_image_id=project.id, model_name='project')
@@ -500,7 +656,7 @@ def delete_project(project_id):
     db.session.delete(project)
     db.session.commit()
     flash('Project deleted successfully!', 'success')
-    return redirect(url_for('admin_dashboard'))
+    return redirect(url_for('manage_projects'))
 
 # In app.py, within the upload_image function
 @app.route('/upload_image', methods=['POST'])
@@ -535,6 +691,53 @@ def upload_image():
     app.logger.warning("File type not allowed or no file provided for upload.")
     return jsonify({'error': 'File type not allowed or no file provided'}), 400
 
+# --- Project Management (unchanged logic, only model definition moved) ---
+@app.route('/admin/project/new', methods=['GET', 'POST'])
+@login_required
+def new_user():
+    form = LoginForm()
+    user = User(
+        name=form.username.data,
+        password=form.password.data,
+        
+    )
+    db.session.add(user)
+    db.session.commit()
+    flash('User created successfully!', 'success')
+    return render_template('admin/user_form.html', title='New user', form=form, legend='New user')
+
+@app.route('/admin/project/<int:user_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_user(user_id):
+    user = db.session.get(User, user_id)
+    if not user:
+        return "user not found", 404
+
+    form = LoginForm()
+    if form.validate_on_submit():
+        user.username = form.username.data
+        user.password = form.password.data
+        db.session.commit()
+        flash('User updated successfully!', 'success')
+        return redirect(url_for('manage_users'))
+
+    elif request.method == 'GET':
+        form.username.data = user.username
+        form.password.data = project.password
+    return render_template('admin/user.html', title='Edit User', form=form, legend='Edit User', model_name='user')
+
+@app.route('/admin/project/<int:user_id>/delete', methods=['POST'])
+@login_required
+def delete_user(user_id):
+    user = db.session.get(User, user_id)
+    if not user:
+        return "User not found", 404
+    db.session.delete(user)
+    db.session.commit()
+    flash('User deleted successfully!', 'success')
+    return redirect(url_for('manage_users'))
+
+
 if __name__ == '__main__':
     with app.app_context():
         # Correctly check for table existence using inspect
@@ -560,4 +763,4 @@ if __name__ == '__main__':
         else:
             print(f"Admin user '{admin_username}' already exists.")
 
-    #app.run(debug=True) # Run with debug=True for development
+    app.run(debug=True) # Run with debug=True for development

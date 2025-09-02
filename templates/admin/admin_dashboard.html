@@ -1,0 +1,58 @@
+﻿{% extends "admin/admin.html" %}
+{% block admin_content %}
+<div class="p-6">
+    <h1 class="text-2xl font-bold mb-4">📊 Dashboard</h1>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+        {% for label, value in stats.items() %}
+        <div class="bg-white p-4 rounded-xl shadow">
+            <h2 class="text-gray-500 text-sm">{{ label|capitalize }}</h2>
+            <p class="text-2xl font-bold">{{ value }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Chart.js Example -->
+    <div class="bg-white p-6 rounded-xl shadow mb-8">
+        <canvas id="contentChart"></canvas>
+    </div>
+
+    <!-- Recent Projects & Blogs -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white p-4 rounded-xl shadow">
+            <h2 class="font-bold mb-2">🛠 Latest Projects</h2>
+            <ul>
+                {% for project in latest_projects %}
+                <li class="border-b py-1">{{ project.title }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow">
+            <h2 class="font-bold mb-2">✍️ Latest Blog Posts</h2>
+            <ul>
+                {% for post in latest_blogs %}
+                <li class="border-b py-1">{{ post.title }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const ctx = document.getElementById('contentChart');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Projects', 'Blogs', 'Skills', 'Users'],
+      datasets: [{
+        label: 'Content Count',
+        data: [{{ stats['projects'] }}, {{ stats['blog_posts'] }}, {{ stats['skills'] }}, {{ stats['users'] }}],
+        borderWidth: 1
+      }]
+    }
+  });
+</script>
+{% endblock %}

@@ -75,53 +75,36 @@
     <div class="container mx-auto text-center">
         <h2 class="text-3xl md:text-4xl font-bold text-blue-700 mb-10">My Core Skills: Driving Efficiency and Innovation</h2>
         <p>From robust CRM solutions to insightful data visualizations, my diverse skill set is designed to tackle your most pressing IT challenges.</p>
+        
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
+            {% for skill in skills %}
             <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-blue-100">
-                <h3 class="text-2xl font-semibold text-blue-600 mb-3">Zoho CRM Customization</h3>
-                <p class="text-gray-700">
-                    I tailor Zoho CRM modules, layouts, workflows, and automation rules, empowering your sales and customer management teams with processes precisely fit to their unique needs, boosting efficiency and conversion.
-                </p>
-            </div>
+                <h2 class="text-2xl font-semibold text-blue-600 mb-3">
+                    <a href="{{ url_for('portfolio_by_skill', skill_id=skill.id) }}" class="text-blue-600 hover:underline">
+                        {{ skill.name }}
+                    </a>
+                </h2>
+                <p class="text-gray-600 mt-2">{{ skill.description }}</p>
 
-            <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-blue-100">
-                <h3 class="text-2xl font-semibold text-blue-600 mb-3">Zoho Creator App Development</h3>
-                <p class="text-gray-700">
-                    I design and build intuitive, custom web and mobile applications on Zoho Creator, extending your Zoho functionality to solve specific business challenges and fill operational gaps.
-                </p>
+                {% if skill.subskills %}
+                <ul class="mt-3 list-disc list-inside text-sm text-gray-500">
+                    {% for subskill in skill.subskills %}
+                    <li>
+                        <a href="{{ url_for('portfolio_by_subskill', subskill_id=subskill.id) }}" class="text-gray-700 hover:underline">
+                            {{ subskill.name }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
             </div>
+            {% endfor %}
 
-            <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-blue-100">
-                <h3 class="text-2xl font-semibold text-blue-600 mb-3">Deluge Scripting</h3>
-                <p class="text-gray-700">
-                    I leverage my proficiency in Deluge to write custom functions and scripts that automate complex workflows, seamlessly integrate your Zoho applications, and enhance data manipulation for smarter operations.
-                </p>
-            </div>
-
-            <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-blue-100">
-                <h3 class="text-2xl font-semibold text-blue-600 mb-3">Zoho Analytics</h3>
-                <p class="text-gray-700">
-                    I create insightful and interactive dashboards and reports using Zoho Analytics, connecting diverse data sources to provide clear, visual representations of your key business metrics for data-driven decisions.
-                </p>
-            </div>
-
-            <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-blue-100">
-                <h3 class="text-2xl font-semibold text-blue-600 mb-3">Python Development</h3>
-                <p class="text-gray-700">
-                    I develop robust Python solutions for efficient data processing, powerful automation scripts, seamless API integrations, and scalable backend logic, streamlining your operations and driving innovation."
-                </p>
-            </div>
-
-            <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-blue-100">
-                <h3 class="text-2xl font-semibold text-blue-600 mb-3">Dashboard Creation (Python)</h3>
-                <p class="text-gray-700">
-                    I build interactive and dynamic dashboards using Python libraries (e.g., Plotly, Dash) to visualize complex datasets, transforming raw information into actionable insights for strategic decision-making.Building interactive and dynamic dashboards using Python libraries (e.g., Plotly, Dash) to visualize complex datasets and provide actionable insights.
-                </p>
-            </div>
 
         </div>
     </div>
 </section>
+
 
 <section id="portfolio" class="py-16 md:py-24 bg-white rounded-lg shadow-md mx-auto my-12 max-w-6xl px-6">
     <div class="container mx-auto text-center">
@@ -132,7 +115,7 @@
             {% for project in latest_projects %}
             <div class="bg-gray-50 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-blue-100 text-left">
                 {# You might also want to display a project image here if you have one #}
-                <img src="{{ url_for('get_image', model_name='project', image_id=project.id) }}" alt="{{ project.title }}" class="mb-4 rounded-md"> 
+                <img src="{{ url_for('get_image', model_name='project', image_id=project.id) }}" alt="{{ project.title }}" class="mb-4 rounded-md">
 
                 <h3 class="text-2xl font-semibold text-blue-600 mb-3">{{ project.title }}</h3>
                 <p class="text-gray-700 mb-4 text-sm">
