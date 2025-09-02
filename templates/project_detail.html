@@ -1,5 +1,17 @@
 ﻿{% extends "base.html" %}
 
+{% block title %}{{ project.title }} | Stephen Awili Portfolio{% endblock %}
+{% block description %}{{ project.description[:150] }}{% endblock %}
+
+
+{% block og_image %}
+{{ url_for('get_image', model_name='project', image_id=project.id, _external=True) }}
+{% endblock %}
+
+{% block twitter_image %}
+{{ url_for('get_image', model_name='project', image_id=project.id, _external=True) }}
+{% endblock %}
+
 {% block content %}
 <div class="container mx-auto px-4 py-16 md:py-24 max-w-4xl">
     <article class="bg-white rounded-lg shadow-lg p-8">
@@ -34,11 +46,12 @@
         </div>
         {% endif %}
         <p>Subskills:</p>
-        
-            {% for subskill in project.subskills %}
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                <a href="{{ url_for('portfolio_by_subskill', subskill_id=subskill.id) }}">{{ subskill.name }}</a></span>
-                {% endfor %}
+
+        {% for subskill in project.subskills %}
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+            <a href="{{ url_for('portfolio_by_subskill', subskill_id=subskill.id) }}">{{ subskill.name }}</a>
+        </span>
+        {% endfor %}
 
 
         <div class="flex flex-wrap justify-center gap-4 mt-8">

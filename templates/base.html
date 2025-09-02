@@ -3,10 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stephen Awili - Portfolio | CRM, Python, Analytics</title>
-    <meta name="description" content="Explore the professional portfolio of Stephen Awili, an IT Specialist and Zoho Consultant in Nairobi, Kenya. Specializing in Zoho CRM customization, Creator app development, Deluge scripting, Zoho Analytics, Python for data analysis, and interactive dashboard creation.">
-    <meta name="keywords" content="Stephen Awili, Steve Awilly, Stephen Awili, Steve Awili, Awili Steve, awilisteve.co.ke, Stephen Awili Zoho, Stephen Awili Python Zoho consultant in Nairobi Kenya, Zoho implementation, Zoho CRM customization, Zoho Creator development, Deluge scripting, Zoho Analytics, Python development, data analysis, dashboard creation, IT specialist, Web developer, Zoho intergration, IT consulting Nairobi Kenya, Zoho expert in Nairobi Kenya, business automation in Nairobi Kenya, Zoho specialist Kenya, Zoho CRM expert, Zoho consultant Kenya, Zoho Creator developer, Zoho CRM customization, Zoho implementation Kenya, Zoho automation expert, 
-Zoho partner Kenya, Python automation developer, API integration expert, Python developer Kenya, Business automation with Python, Data processing with Python, Streamlit dashboard developer, Google Sheets automation expert, How to customize Zoho CRM, 
+    <title>{% block title %}Stephen Awili - Portfolio{% endblock %}</title>
+    <meta name="description" content="{% block description %}Explore the professional portfolio of Stephen Awili, an IT Specialist and Zoho Consultant in Nairobi, Kenya.{% endblock %}">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="{% block og_title %}{% block title %}Stephen Awili - Portfolio{% endblock %}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{% block description %}Explore the professional portfolio of Stephen Awili...{% endblock %}{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:image" content="{% block og_image %}{{ url_for('static', filename='uploads/S-blue.png', _external=True) }}{% endblock %}">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}{% block title %}{% endblock %}{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}{% block description %}{% endblock %}{% endblock %}">
+    <meta name="twitter:image" content="{% block twitter_image %}{{ url_for('static', filename='uploads/S-blue.png', _external=True) }}{% endblock %}">
+
+    <meta name="keywords" content="Stephen Awili, Steve Awilly, Stephen Awili, Steve Awili, Awili Steve, awilisteve.co.ke, Stephen Awili Zoho, Stephen Awili Python Zoho consultant in Nairobi Kenya, Zoho implementation, Zoho CRM customization, Zoho Creator development, Deluge scripting, Zoho Analytics, Python development, data analysis, dashboard creation, IT specialist, Web developer, Zoho intergration, IT consulting Nairobi Kenya, Zoho expert in Nairobi Kenya, business automation in Nairobi Kenya, Zoho specialist Kenya, Zoho CRM expert, Zoho consultant Kenya, Zoho Creator developer, Zoho CRM customization, Zoho implementation Kenya, Zoho automation expert,
+Zoho partner Kenya, Python automation developer, API integration expert, Python developer Kenya, Business automation with Python, Data processing with Python, Streamlit dashboard developer, Google Sheets automation expert, How to customize Zoho CRM,
 Best Zoho CRM consultant near me, Build fleet management app Zoho, Automate business workflows in Zoho, Zoho CRM quote automation, Automate sales reports Google Sheets, Sales dashboard for sales reps, WhatsApp integration with Zoho CRM, End-to-end business automation Zoho, Move company CRM setup (good for movers/your Taylor Movers case study)">
     <meta name="author" content="Stephen Awili">
     <meta property="og:type" content="website">
