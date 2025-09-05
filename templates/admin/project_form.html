@@ -99,14 +99,14 @@
 <script src="https://cdn.tiny.cloud/1/s8fcksw29pdzm6ocyxze8notxj126qq5rvbyrid88fmknjmh/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
     tinymce.init({
-        selector: '#blog-content-editor', // Or '#project-content-editor' for projects
+        selector: '#project-content-editor', // Or '#project-content-editor' for projects
         plugins: 'advlist autolink lists link image charmap anchor searchreplace visualblocks code fullscreen insertdatetime media table code help wordcount',
         toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | link image | code | help',
 
         // --- THESE ARE CRUCIAL FOR URL HANDLING ---
         relative_urls: false,
         remove_script_host: false,
-        document_base_url: 'http://127.0.0.1:5000/', // IMPORTANT: Match your Flask app's base URL
+        document_base_url: 'https://awilisteve.co.ke'// IMPORTANT: Match your Flask app's base URL
         convert_urls: false, // Added last time, keep this
 
         // --- IMAGE UPLOAD SPECIFIC ---
