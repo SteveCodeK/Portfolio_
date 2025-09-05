@@ -81,7 +81,7 @@
         </div>
         <div class="max-w-3xl mx-auto mt-8">
             <h3 class="text-xl font-semibold mb-4 text-green-700">Comments</h3>
-            {% for comment in project.comments %}
+            {% for comment in post.comments %}
             <div class="bg-gray-100 p-4 rounded-lg mb-3">
                 <p class="font-medium text-gray-800">
                     {{ comment.user.username if comment.user else comment.guest_name or "Anonymous" }}
