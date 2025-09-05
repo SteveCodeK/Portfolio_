@@ -19,6 +19,7 @@ import io # Import io for BytesIO
 from sqlalchemy import inspect # Import inspect for proper table existence check
 from bleach.css_sanitizer import CSSSanitizer
 from cms_dashboard import dashboard_bp
+from flask_mail import Mail, Message
 
 
 load_dotenv()
@@ -29,6 +30,15 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/other_uploads' # Adjusted for clarity
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+# Flask-Mail config (use Gmail or your provider)
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'awilisteve076@gmail.com'
+app.config['MAIL_PASSWORD'] = '$teve2001'
+app.config['MAIL_DEFAULT_SENDER'] = 'awilisteve076@gmail.com'
+
+mail = Mail(app)
 
 sitemap = Sitemap(app=app)
 app.config['SITEMAP_URL_SCHEME'] = 'https'
@@ -185,7 +195,20 @@ def home():
 def about():
     return render_template('about.html', title='About Me')
 
+@app.route("/contact", methods=["POST"])
+def contact():
+    name = request.form.get("name")
+    email = request.form.get("email")
+    message = request.form.get("message")
 
+    msg = Message(
+        subject=f"New Contact Form Submission from {name}",
+        recipients=["your_email@gmail.com"],  # your receiving email
+        body=f"Name: {name}\nEmail: {email}\n\nMessage:\n{message}"
+    )
+    mail.send(msg)
+    flash("Your message has been sent successfully!", "success")
+    return redirect(url_for("home"))  # send them back to homepage
 
 @app.route("/portfolio/skill/<int:skill_id>")
 def portfolio_by_skill(skill_id):
@@ -295,9 +318,6 @@ def blog_post(slug):
     return render_template("blog.html", post=post, form=form, title=post.title)
 
 
-@app.route('/contact')
-def contact():
-    return render_template('contact.html', title='Contact Me')
 
 # --- Admin Routes (unchanged logic, only model definition moved) ---
 @app.route('/login', methods=['GET', 'POST'])
