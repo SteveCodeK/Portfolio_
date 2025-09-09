@@ -2,8 +2,4 @@
 User-agent: *
 Allow: /
 
-# Disallow admin areas
-Disallow: /admin
-Disallow: /login
-
 Sitemap: https://www.awilisteve.co.ke/sitemap.xml # Link to your sitemap!
