@@ -31,6 +31,20 @@ Best Zoho CRM consultant near me, Build fleet management app Zoho, Automate busi
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="canonical" href="{{ request.base_url }}">
     <style>
+
+        .hero-bg {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        }
         /* Custom styles for the Inter font and smooth scrolling */
         body {
             font-family: 'Inter', sans-serif;
@@ -97,7 +111,7 @@ Best Zoho CRM consultant near me, Build fleet management app Zoho, Automate busi
 
             <div id="desktop-menu" class="hidden md:flex space-x-4">
                 <a href="{{ url_for('home') }}#about" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">About</a>
-                <a href="{{ url_for('home') }}#skills" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">Skills</a>
+                <a href="{{ url_for('home') }}#about" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">Skills</a>
                 <a href="{{ url_for('portfolio') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">Portfolio</a>
                 <a href="{{ url_for('blog') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">Blog</a>
                 <a href="{{ url_for('home') }}#contact" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">Contact</a>
@@ -178,6 +192,28 @@ Best Zoho CRM consultant near me, Build fleet management app Zoho, Automate busi
 
     {% block scripts %}
     <script>
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+
+        feather.replace();
+
+        VANTA.GLOBE({
+            el: "#vanta-globe",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0x3b82f6,
+            backgroundColor: 0xf5f7fa,
+            size: 0.8
+        });
+
         document.addEventListener('DOMContentLoaded', function() {
             const menuToggle = document.getElementById('menu-toggle');
             const mobileMenu = document.getElementById('mobile-menu');
@@ -204,7 +240,7 @@ Best Zoho CRM consultant near me, Build fleet management app Zoho, Automate busi
                     // Check if the link is an internal hash and we are on the same page
                     // or if it's explicitly navigating to the home page's hash
                     const isInternalHashOnSamePage = hash.startsWith('#') && (window.location.pathname === '/' || window.location.pathname === '/home');
-                    const isExternalHomeHash = hash.startsWith('{{ url_for('home') }}#') && window.location.origin + window.location.pathname !== '{{ url_for('home', _external=False) }}';
+                    //const isExternalHomeHash = hash.startsWith('{{ url_for('home') }}#') && window.location.origin + window.location.pathname !== '{{ url_for('home', _external=False) }}'; #}
 
                     if (targetElement && (isInternalHashOnSamePage || isExternalHomeHash)) {
                         e.preventDefault(); // Prevent instant jump
