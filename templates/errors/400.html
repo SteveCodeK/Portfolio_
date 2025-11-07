@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}400 - Bad Request{% endblock %}
+
+{% block content %}
+<div class="container text-center py-5">
+    <h1 class="display-1">400</h1>
+    <h2 class="mb-4">Bad Request</h2>
+    <p class="lead mb-4">The request could not be processed due to invalid data.</p>
+    {% if error %}
+    <p class="text-muted">{{ error }}</p>
+    {% endif %}
+    <div>
+        <a href="{{ url_for('home') }}" class="btn btn-primary">Return Home</a>
+    </div>
+</div>
+{% endblock %}

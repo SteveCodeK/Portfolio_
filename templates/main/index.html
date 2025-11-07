@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- Hero -->
+<section id="home" class="hero-bg min-h-screen flex items-center pt-16 relative">
+    <div id="vanta-globe" class="absolute inset-0 w-full h-full"></div>
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="py-20 md:py-32 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4" data-aos="fade-up">
+                <span class="text-gradient">Stephen Awili</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-600 mb-6 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+                Zoho Developer & IT Automation Engineer — I build integrated Zoho solutions and Python automations that streamline operations and surface clear insights.
+            </p>
+
+            <div class="flex items-center justify-center gap-3" data-aos="fade-up" data-aos-delay="200">
+                <a href="#work" class="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">View Work</a>
+                <a href="#contact" class="px-6 py-3 border border-gray-300 rounded-md hover:bg-gray-50 transition">Hire Me</a>
+                <a href="{{ url_for('static', filename='Stephen_Awili_CV.pdf') }}" class="px-6 py-3 border border-gray-300 rounded-md hover:bg-gray-50 transition">Download CV</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- About -->
+<section id="about" class="py-20 bg-gray-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div data-aos="fade-right">
+                <h2 class="text-3xl font-bold mb-4">About Me</h2>
+                <h3 class="text-2xl md:text-3xl font-extrabold text-blue-800 mb-4">Empowering Businesses Through Smart IT & Zoho Solutions</h3>
+                <p class="text-gray-600 mb-4">As an IT Specialist and Zoho consultant I help organisations automate workflows, customise CRM systems, and build dashboards that drive decisions.</p>
+                <p class="text-gray-600">My work combines Zoho platform customisation, Deluge scripting, and Python automation to solve operational problems and unlock growth.</p>
+            </div>
+
+            <div data-aos="fade-left">
+                <div class="bg-white p-8 rounded-xl shadow-md">
+                    <h3 class="text-xl font-bold mb-4">Core Skills</h3>
+                    <div class="space-y-3">
+                        {% for skill in skills %}
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <a href="{{ url_for('portfolio_by_skill', skill_id=skill.id) }}" class="font-semibold text-gray-800 hover:text-blue-600">{{ skill.name }}</a>
+                                {% if skill.description %}
+                                <p class="text-sm text-gray-500">{{ skill.description }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- Projects (latest) -->
+<section id="work" class="py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold mb-4" data-aos="fade-up">My Projects</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">Recent work and case studies demonstrating practical business value.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {% for project in latest_projects %}
+            <div class="project-card bg-white rounded-xl overflow-hidden shadow-md transition duration-300" data-aos="fade-up">
+                <div class="h-64 bg-gray-100 overflow-hidden">
+                    <img src="{{ url_for('get_image', model_name='project', image_id=project.id) }}" alt="{{ project.title }}" class="w-full h-full object-cover">
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold mb-2">{{ project.title }}</h3>
+                    <p class="text-gray-600 mb-4">{{ project.description | striptags | truncate(140, True, '...') }}</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        {% for s in project.subskills %}
+                        <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">{{ s.name }}</span>
+                        {% endfor %}
+                    </div>
+                    <a href="{{ url_for('project_detail', slug=project.slug) }}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-full text-sm hover:bg-blue-700 transition-colors shadow-md">View Project</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-12" data-aos="fade-up">
+            <a href="{{ url_for('portfolio') }}" class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-md hover:bg-gray-50 transition">View All Projects</a>
+        </div>
+    </div>
+</section>
+
+
+<!-- Latest Blog Posts -->
+<section id="blog-latest" class="py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold mb-4" data-aos="fade-up">Latest Blog Posts</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">Insights, case studies and technical notes.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {% for post in latest_blogs %}
+            <div class="project-card bg-white rounded-xl overflow-hidden shadow-md transition duration-300" data-aos="fade-up">
+                <div class="h-64 bg-gray-100 overflow-hidden">
+                    <img src="{{ url_for('get_image', model_name='blog', image_id=post.id) }}" alt="{{ post.title }}" class="w-full h-full object-cover">
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold mb-2">{{ post.title }}</h3>
+                    <p class="text-gray-600 mb-4">{{ post.content | striptags | truncate(140, True, '...') }}</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-500">{{ post.date_posted.strftime('%B %d, %Y') }}</span>
+                        <a href="{{ url_for('blog_post', slug=post.slug) }}" class="text-blue-600 hover:text-blue-800 font-medium">Read More</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-12" data-aos="fade-up">
+            <a href="{{ url_for('blog') }}" class="inline-block bg-blue-700 text-white px-8 py-3 rounded-full text-lg font-semibold shadow-lg transition-all duration-300 transform hover:scale-105">View All Posts</a>
+        </div>
+    </div>
+</section>
+
+
+<!-- Contact Section -->
+<section id="contact" class="py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold mb-4">Get in Touch</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">Have a project in mind or want to collaborate? I'd love to hear from you.</p>
+        </div>
+
+        <div class="max-w-2xl mx-auto">
+            <form method="POST" action="{{ url_for('contact') }}" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                        <input name="name" type="text" id="name" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" required>
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input name="email" type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" required>
+                    </div>
+                </div>
+                <div>
+                    <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                    <input name="subject" type="text" id="subject" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div>
+                    <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                    <textarea name="message" id="message" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" required></textarea>
+                </div>
+                <div>
+                    <button type="submit" class="w-full px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">Send Message</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

@@ -316,6 +316,43 @@ paket-files/
 __pycache__/
 *.pyc
 
+# Python virtual environment
+venv/
+env/
+.env
+.env.*
+!.env.example
+
+# Python specific
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# SQLite database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Instance folder
+instance/
+
 # Cake - Uncomment if you are using it
 # tools/**
 # !tools/packages.config
