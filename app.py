@@ -115,6 +115,9 @@ def create_app(config_name=None):
     db.init_app(app)
     mail.init_app(app)
     login_manager = LoginManager(app)
+    # Ensure Flask-Login redirects to the auth login endpoint when protecting
+    # routes with @login_required. Use setattr to avoid narrow static typing issues.
+    setattr(login_manager, 'login_view', 'auth.login')
     # login_manager.login_view = 'auth.login'  # Disabled due to type error
     sitemap = Sitemap()
     sitemap.init_app(app)
@@ -273,6 +276,12 @@ def home():
 @app.route('/about')
 def about():
     return render_template('about.html', title='About Me')
+
+
+# Backwards-compatible convenience route: /login -> /auth/login
+@app.route('/login')
+def legacy_login():
+    return redirect(url_for('auth.login', next=request.args.get('next')))
 
 @app.route("/contact", methods=["POST"])
 def contact():
