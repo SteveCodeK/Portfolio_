@@ -90,9 +90,11 @@
                 <div>
                     {{ form.rating.label(class="block text-sm font-medium text-gray-700") }}
                     <div class="flex items-center space-x-2 mt-2">
-                        {% for subfield in form.rating %}
-                            <label class="cursor-pointer text-2xl text-gray-300 peer-checked:text-yellow-400">{{ subfield }}&#9733;</label>
-                        {% endfor %}
+                        {# Render rating as a numeric input (1-5) rather than iterating over
+                           an IntegerField which is not iterable. This keeps the form simple
+                           and prevents template runtime errors. #}
+                        {{ form.rating(class="w-24 px-3 py-2 border rounded-lg", min=1, max=5, placeholder="1-5") }}
+                        <small class="text-sm text-gray-500">Rate 1 (low) — 5 (high)</small>
                     </div>
                 </div>
 

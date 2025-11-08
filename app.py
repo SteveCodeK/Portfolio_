@@ -249,7 +249,7 @@ def home():
         latest_blogs = BlogPost.query.order_by(BlogPost.date_posted.desc()).limit(3).all()
         latest_projects = Project.query.order_by(Project.id.desc()).limit(3).all()
         skills = Skill.query.all()
-        
+
         # get count of skills used in projects
         # Fix join: use actual table/class, not relationship property
         from sqlalchemy.orm import aliased
@@ -258,12 +258,14 @@ def home():
             Project, Skill.id,
             db.func.count(Skill.id)
         ).join(Project.subskills.of_type(SubSkillModel)).join(Skill, SubSkillModel.skill_id == Skill.id).group_by(Project.id, Skill.id).all()
-        
+
         app.logger.debug(f'Retrieved {len(latest_blogs)} blogs, {len(latest_projects)} projects, {len(skills)} skills')
+        # Calculate total projects for the About section
+        total_projects = Project.query.count()
         # Templates are organized under the `templates/main/` directory.
         # Use the explicit path to avoid TemplateNotFound errors when the
         # default template name isn't located at the top-level templates dir.
-        return render_template('main/index.html', latest_blogs=latest_blogs, latest_projects=latest_projects, skills=skills, skill_used=skill_count)
+        return render_template('main/index.html', latest_blogs=latest_blogs, latest_projects=latest_projects, skills=skills, skill_used=skill_count, total_projects=total_projects)
     except Exception as e:
         app.logger.error('Error in home page:', exc_info=True)
         raise
