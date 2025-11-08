@@ -79,7 +79,7 @@
                 {# Display current image when editing #}
                 {% if current_image_id %}
                 <p>Current Image:</p>
-                <img src="{{ url_for('get_image', model_name=model_name, image_id=current_image_id) }}" alt="Current Image" style="max-width: 200px;">
+                <img src="{{ url_for('main.get_image', model_name=model_name, image_id=current_image_id) }}" alt="Current Image" style="max-width: 200px;">
                 {% elif current_image and current_image == 'default_project.jpg' and legend == 'Edit Project' %}
                 <p class="text-gray-600 text-sm mt-2">No custom image uploaded. Using default.</p>
                 {% endif %}
@@ -114,12 +114,12 @@
         // --- IMAGE UPLOAD SPECIFIC ---
         automatic_uploads: true, // Enables automatic upload when dropping/pasting
         file_picker_types: 'image', // Ensures the file picker dialog includes image types
-        images_upload_url: '{{ url_for("upload_image") }}', // Flask endpoint for handling uploads
+    images_upload_url: '{{ url_for("admin.upload_image") }}', // Flask endpoint for handling uploads
         images_upload_handler: function (blobInfo, success, failure) {
             var xhr, formData;
             xhr = new XMLHttpRequest();
             xhr.withCredentials = false; // Set to true if your Flask app uses sessions/cookies for auth across domains (unlikely on 127.0.0.1)
-            xhr.open('POST', '{{ url_for("upload_image") }}');
+            xhr.open('POST', '{{ url_for("admin.upload_image") }}');
 
             xhr.onload = function () {
                 var json;
