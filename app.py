@@ -126,20 +126,37 @@ def create_app(config_name=None):
     register_error_handlers(app)
 
     # Register blueprints
-    from blueprints.main import bp as main_bp
-    app.register_blueprint(main_bp)
+    # Register blueprints with defensive error handling so import-time
+    # failures are logged and don't crash the whole process silently.
+    try:
+        from blueprints.main import bp as main_bp
+        app.register_blueprint(main_bp)
+    except Exception as e:
+        app.logger.exception('Failed to register main blueprint: %s', e)
 
-    from blueprints.blog import bp as blog_bp
-    app.register_blueprint(blog_bp)
+    try:
+        from blueprints.blog import bp as blog_bp
+        app.register_blueprint(blog_bp)
+    except Exception as e:
+        app.logger.exception('Failed to register blog blueprint: %s', e)
 
-    from blueprints.portfolio import bp as portfolio_bp
-    app.register_blueprint(portfolio_bp)
+    try:
+        from blueprints.portfolio import bp as portfolio_bp
+        app.register_blueprint(portfolio_bp)
+    except Exception as e:
+        app.logger.exception('Failed to register portfolio blueprint: %s', e)
 
-    from blueprints.auth import bp as auth_bp
-    app.register_blueprint(auth_bp)
+    try:
+        from blueprints.auth import bp as auth_bp
+        app.register_blueprint(auth_bp)
+    except Exception as e:
+        app.logger.exception('Failed to register auth blueprint: %s', e)
 
-    from blueprints.admin.views import bp as admin_bp
-    app.register_blueprint(admin_bp)
+    try:
+        from blueprints.admin.views import bp as admin_bp
+        app.register_blueprint(admin_bp)
+    except Exception as e:
+        app.logger.exception('Failed to register admin blueprint: %s', e)
 
     # Set up user loader
     @login_manager.user_loader
