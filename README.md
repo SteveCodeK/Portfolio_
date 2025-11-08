@@ -164,7 +164,7 @@ This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.t
 ## Author
 
 **Stephen Awili**
-- Website: [awilisteve.co.ke]
+- Website: [awilisteve.co.ke](https://awilisteve.co.ke)
 - GitHub: [@SteveCodeK](https://github.com/SteveCodeK)
 
 ## Acknowledgments
