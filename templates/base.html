@@ -25,85 +25,341 @@ Best Zoho CRM consultant near me, Build fleet management app Zoho, Automate busi
     <meta name="author" content="Stephen Awili">
     <meta property="og:type" content="website">
 
+    <!-- CSS Dependencies -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/png" sizes="32x32">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/locomotive-scroll/4.1.4/locomotive-scroll.min.css">
     <link rel="canonical" href="{{ request.base_url }}">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/png" sizes="32x32">
+    
     <style>
+        :root {
+            --color-primary: #5D3BEE;
+            --color-secondary: #FF8A56;
+            --color-dark: #000248;
+            --color-body: #575757;
+            --font-primary: 'DM Sans', sans-serif;
+            --transition-base: all 0.3s ease;
+            --transition-smooth: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-        .hero-bg {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        }
-        .project-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-        .text-gradient {
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-image: linear-gradient(90deg, #3b82f6, #8b5cf6);
-        }
-        /* Custom styles for the Inter font and smooth scrolling */
         body {
-            font-family: 'Inter', sans-serif;
-            scroll-behavior: smooth;
-            background-color: #f8fafc; /* Light blue-gray background */
-        }
-        /* Style for active navigation link (optional, for future JS implementation) */
-        .nav-link.active {
-            font-weight: 600;
-            color: #1d4ed8; /* Blue-700 */
-        }
-        /* Custom scrollbar for a cleaner look */
-        ::-webkit-scrollbar {
-            width: 8px;
+            font-family: var(--font-primary);
+            color: var(--color-body);
+            line-height: 1.7;
+            background-color: #ffffff;
         }
 
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+        /* Typography with Animation */
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--color-dark);
+            font-weight: 700;
+            line-height: 1.2;
+            transition: var(--transition-base);
+        }
+
+        /* Enhanced Button Styles */
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: #fff;
+            padding: 16px 32px;
             border-radius: 10px;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1; /* Slate-300 */
-            border-radius: 10px;
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.1);
+            transform: scaleY(0);
+            transform-origin: bottom;
+            transition: transform 0.3s ease;
+            z-index: -1;
         }
 
-            ::-webkit-scrollbar-thumb:hover {
-                background: #94a3b8; /* Slate-400 */
-            }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(93, 59, 238, 0.2);
+        }
 
-        @keyframes slideIn {
-            0% {
-                transform: translateX(100%); /* start off-screen */
-                opacity: 0.7;
-            }
+        .btn-primary:hover::after {
+            transform: scaleY(1);
+        }
 
-            100% {
-                transform: translateX(0);
+        /* Enhanced Card Styles */
+        .card {
+            border-radius: 20px;
+            overflow: hidden;
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--color-primary), transparent);
+            opacity: 0;
+            transition: var(--transition-smooth);
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .card:hover::before {
+            opacity: 0.1;
+        }
+
+        /* Enhanced Navigation Styles */
+        .nav-link {
+            font-weight: 500;
+            padding: 8px 16px;
+            transition: var(--transition-base);
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--color-primary);
+            transform: scaleX(0);
+            transition: var(--transition-base);
+            transform-origin: right;
+        }
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        /* Advanced Animation Classes */
+        .reveal-type {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: var(--transition-smooth);
+        }
+
+        .reveal-type.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        .slide-up {
+            animation: slideUp 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .scale-in {
+            animation: scaleIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .rotate-in {
+            animation: rotateIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        /* Animation Keyframes */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
                 opacity: 1;
             }
         }
 
-        .animate-slide-in {
-            animation: slideIn 1.8s ease-out forwards;
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(60px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
 
+        @keyframes rotateIn {
+            from {
+                opacity: 0;
+                transform: rotate(-10deg) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: rotate(0) scale(1);
+            }
+        }
+
+        /* Scroll Animation */
+        .scroll-animate {
+            transition: var(--transition-smooth);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .scroll-animate.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Enhanced Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--color-primary);
+            border-radius: 5px;
+            transition: var(--transition-base);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4526c3;
+        }
+
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Hero Section Styles */
+        #home .text-body {
+            color: var(--color-dark);
+            opacity: 0.85;
+        }
+
+        #home .space-y-8 > * {
+            position: relative;
+            z-index: 30;
+        }
+
+        /* Interactive Background Patterns */
+        .bg-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bg-pattern::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--color-primary), transparent);
+            opacity: 0;
+            transition: var(--transition-smooth);
+        }
+
+        .bg-pattern:hover::after {
+            opacity: 0.05;
+        }
+
+        /* Hover Effects */
+        .hover-lift {
+            transition: var(--transition-smooth);
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .hover-glow {
+            transition: var(--transition-smooth);
+        }
+
+        .hover-glow:hover {
+            box-shadow: 0 0 20px rgba(93, 59, 238, 0.3);
+        }
+
+        /* Loading States */
+        .loading {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            from {
+                transform: translateX(-100%);
+            }
+            to {
+                transform: translateX(100%);
+            }
+        }
     </style>
 </head>
-<body class="bg-gradient-to-r from-[#a6a6a6] to-[#ffffff]">
+<body class="font-primary text-body overflow-x-hidden">
+    <!-- Preloader -->
+    <div id="preloader" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-primary"></div>
+    </div>
 
-
+    <!-- Header -->
     {% include 'partials/header.html' %}
 
+    <!-- Flash Messages -->
     <div class="container mx-auto px-4 mt-4">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         {% for category, message in messages %}
-        <div class="p-3 mb-4 rounded-md text-sm {% if category == 'success' %}bg-green-100 text-green-800{% elif category == 'danger' %}bg-red-100 text-red-800{% else %}bg-blue-100 text-blue-800{% endif %}" role="alert">
+        <div class="p-4 mb-4 rounded-lg text-sm transition-all duration-300 {% if category == 'success' %}bg-green-50 text-green-800 border-l-4 border-green-500{% elif category == 'danger' %}bg-red-50 text-red-800 border-l-4 border-red-500{% else %}bg-blue-50 text-blue-800 border-l-4 border-blue-500{% endif %}" role="alert">
             {{ message }}
         </div>
         {% endfor %}
@@ -111,22 +367,50 @@ Best Zoho CRM consultant near me, Build fleet management app Zoho, Automate busi
         {% endwith %}
     </div>
 
-    {% block content %}{% endblock %}
+    <!-- Main Content -->
+    <main class="overflow-hidden">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    {% include 'partials/footer.html' %}
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="fixed bottom-8 right-8 bg-primary text-white p-3 rounded-full shadow-lg opacity-0 transition-all duration-300 hover:transform hover:scale-110">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/locomotive-scroll/4.1.4/locomotive-scroll.min.js"></script>
     <script>window.$zoho = window.$zoho || {}; $zoho.salesiq = $zoho.salesiq || { ready: function () { } }</script>
     <script id="zsiqscript" src="https://salesiq.zohopublic.com/widget?wc=siq2aec5856b2f431516b64dabd820f547322bd1383f7b03aa036a1b91154328be5" defer></script>
 
-    {% include 'partials/footer.html' %}
-
-    {% block scripts %}
     <script>
+        // Register ScrollTrigger Plugin
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Initialize AOS
         AOS.init({
-            duration: 800,
-            easing: 'ease-in-out',
+            duration: 1000,
+            easing: 'ease-out',
             once: true
         });
 
-        feather.replace();
+        // Preloader
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            preloader.style.opacity = '0';
+            setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 500);
+        });
 
+        // Initialize VANTA.GLOBE
         VANTA.GLOBE({
             el: "#vanta-globe",
             mouseControls: true,
@@ -134,67 +418,83 @@ Best Zoho CRM consultant near me, Build fleet management app Zoho, Automate busi
             gyroControls: false,
             minHeight: 200.00,
             minWidth: 200.00,
-            scale: 1.00,
-            scaleMobile: 1.00,
-            color: 0x3b82f6,
-            backgroundColor: 0xf5f7fa,
-            size: 0.8
+            scale: 0.5,
+            scaleMobile: 0.35,
+            color: 0x5D3BEE,
+            backgroundColor: 0xFFFFFF,
+            size: 0.5,
+            speed: 0.3,
+            spacing: 20.00,
+            showDots: false
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const menuToggle = document.getElementById('menu-toggle');
-            const mobileMenu = document.getElementById('mobile-menu');
+        // Initialize Locomotive Scroll
+        const scroll = new LocomotiveScroll({
+            el: document.querySelector('[data-scroll-container]'),
+            smooth: true,
+            multiplier: 1
+        });
 
-            // Toggle mobile menu visibility
-            menuToggle.addEventListener('click', function() {
-                mobileMenu.classList.toggle('hidden');
+        // Back to Top Button
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTop.style.opacity = '1';
+                backToTop.style.pointerEvents = 'auto';
+            } else {
+                backToTop.style.opacity = '0';
+                backToTop.style.pointerEvents = 'none';
+            }
+        });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
             });
+        });
 
-            // Close mobile menu when a link is clicked
-            mobileMenu.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', () => {
-                    mobileMenu.classList.add('hidden');
-                });
-            });
+        // Mobile Menu
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const header = document.querySelector('header');
 
-            // Smooth scrolling for anchor links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    const hash = this.getAttribute('href');
-                    const targetId = hash.substring(1);
-                    const targetElement = document.getElementById(targetId);
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            document.body.classList.toggle('overflow-hidden');
+        });
 
-                    // Check if the link is an internal hash and we are on the same page
-                    // or if it's explicitly navigating to the home page's hash
-                    const isInternalHashOnSamePage = hash.startsWith('#') && (window.location.pathname === '/' || window.location.pathname === '/home');
-                    //const isExternalHomeHash = hash.startsWith('{{ url_for('home') }}#') && window.location.origin + window.location.pathname !== '{{ url_for('home', _external=False) }}'; #}
+        // Header Scroll Effect
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            if (currentScroll > lastScroll && currentScroll > 100) {
+                header.style.transform = 'translateY(-100%)';
+            } else {
+                header.style.transform = 'translateY(0)';
+            }
+            lastScroll = currentScroll;
+        });
 
-                    if (targetElement && (isInternalHashOnSamePage || isExternalHomeHash)) {
-                        e.preventDefault(); // Prevent instant jump
-                        targetElement.scrollIntoView({
-                            behavior: 'smooth'
-                        });
-                    }
-                });
-            });
-
-            // Handle smooth scrolling when the page loads with a hash (e.g., navigating from another page to home#about)
-            document.addEventListener('DOMContentLoaded', () => {
-                if (window.location.hash) {
-                    const targetId = window.location.hash.substring(1);
-                    const targetElement = document.getElementById(targetId);
-                    if (targetElement) {
-                        // Slight delay to allow page rendering before scrolling
-                        setTimeout(() => {
-                            targetElement.scrollIntoView({
-                                behavior: 'smooth'
-                            });
-                        }, 100);
-                    }
+        // Hero Animations
+        const heroTexts = document.querySelectorAll('.reveal-type');
+        heroTexts.forEach((text, index) => {
+            gsap.fromTo(text, 
+                {
+                    opacity: 0,
+                    y: 50
+                },
+                {
+                    opacity: 1,
+                    y: 0,
+                    duration: 1,
+                    delay: index * 0.2,
+                    ease: 'power2.out'
                 }
-            });
+            );
         });
     </script>
-    {% endblock %}
+
+    {% block scripts %}{% endblock %}
 </body>
 </html>

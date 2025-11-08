@@ -1,162 +1,347 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-<!-- Hero -->
-<section id="home" class="hero-bg min-h-screen flex items-center pt-16 relative">
-    <div id="vanta-globe" class="absolute inset-0 w-full h-full"></div>
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div class="py-20 md:py-32 text-center">
-            <h1 class="text-4xl md:text-6xl font-bold mb-4" data-aos="fade-up">
-                <span class="text-gradient">Stephen Awili</span>
-            </h1>
-            <p class="text-xl md:text-2xl text-gray-600 mb-6 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
-                Zoho Developer & IT Automation Engineer — I build integrated Zoho solutions and Python automations that streamline operations and surface clear insights.
-            </p>
-
-            <div class="flex items-center justify-center gap-3" data-aos="fade-up" data-aos-delay="200">
-                <a href="#work" class="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">View Work</a>
-                <a href="#contact" class="px-6 py-3 border border-gray-300 rounded-md hover:bg-gray-50 transition">Hire Me</a>
-                <a href="{{ url_for('static', filename='Stephen_Awili_CV.pdf') }}" class="px-6 py-3 border border-gray-300 rounded-md hover:bg-gray-50 transition">Download CV</a>
+<div data-scroll-container>
+    <!-- Hero Section -->
+    <section id="home" class="min-h-screen relative overflow-hidden bg-white pt-32" data-scroll-section>
+        <!-- Vanta.js Globe -->
+        <div id="vanta-globe" class="absolute inset-0 z-0 opacity-30"></div>
+        
+        <!-- Solid Background -->
+        <div class="absolute inset-0 bg-gradient-to-b from-white via-white/95 to-white/90 z-10"></div>
+        
+        <div class="container mx-auto px-4 min-h-screen flex items-center relative z-20">
+            <div class="max-w-5xl mx-auto w-full py-20">
+                <div class="text-center relative">
+                    <div class="space-y-8">
+                        <h4 class="text-primary font-medium text-xl relative inline-block">
+                            Hello, I'm
+                        </h4>
+                        <h1 class="text-5xl md:text-7xl font-bold text-dark relative">
+                            Stephen Awili
+                            <span class="text-primary">.</span>
+                        </h1>
+                        <h2 class="text-2xl md:text-4xl font-medium text-dark relative">
+                            Zoho Developer & IT Automation Engineer
+                        </h2>
+                        <p class="text-xl text-body max-w-2xl mx-auto relative">
+                            I build integrated Zoho solutions and Python automations that streamline operations and surface clear insights.
+                        </p>
+                        <div class="flex flex-wrap justify-center gap-4 relative">
+                            <a href="#work" class="btn-primary hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300">
+                                View My Work
+                            </a>
+                            <a href="{{ url_for('static', filename='Stephen_Awili_CV.pdf') }}" class="border-2 border-primary text-primary px-8 py-4 rounded-lg hover:bg-primary hover:text-white transition-all duration-300">
+                                Download CV
+                            </a>
+                        </div>
+                    <h2 class="text-2xl md:text-4xl font-medium text-body mb-8 reveal-type">
+                        Zoho Developer & IT Automation Engineer
+                    </h2>
+                    <p class="text-xl text-body max-w-2xl mx-auto mb-12 reveal-type">
+                        I build integrated Zoho solutions and Python automations that streamline operations and surface clear insights.
+                    </p>
+                    <div class="flex flex-wrap justify-center gap-4 reveal-type">
+                        <a href="#work" class="btn-primary hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300">
+                            View My Work
+                        </a>
+                        <a href="{{ url_for('static', filename='Stephen_Awili_CV.pdf') }}" class="border-2 border-primary text-primary px-8 py-4 rounded-lg hover:bg-primary hover:text-white transition-all duration-300">
+                            Download CV
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</section>
-
-
-<!-- About -->
-<section id="about" class="py-20 bg-gray-50">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div data-aos="fade-right">
-                <h2 class="text-3xl font-bold mb-4">About Me</h2>
-                <h3 class="text-2xl md:text-3xl font-extrabold text-blue-800 mb-4">Empowering Businesses Through Smart IT & Zoho Solutions</h3>
-                <p class="text-gray-600 mb-4">As an IT Specialist and Zoho consultant I help organisations automate workflows, customise CRM systems, and build dashboards that drive decisions.</p>
-                <p class="text-gray-600">My work combines Zoho platform customisation, Deluge scripting, and Python automation to solve operational problems and unlock growth.</p>
+        
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce z-20">
+            <div class="w-8 h-12 border-2 border-primary rounded-full flex items-start justify-center p-2 bg-white/80">
+                <div class="w-1 h-3 bg-primary rounded-full animate-scroll"></div>
             </div>
+        </div>
+    </section>
 
-            <div data-aos="fade-left">
-                <div class="bg-white p-8 rounded-xl shadow-md">
-                    <h3 class="text-xl font-bold mb-4">Core Skills</h3>
-                    <div class="space-y-3">
-                        {% for skill in skills %}
-                        <div class="flex items-start justify-between">
-                            <div>
-                                <a href="{{ url_for('portfolio_by_skill', skill_id=skill.id) }}" class="font-semibold text-gray-800 hover:text-blue-600">{{ skill.name }}</a>
-                                {% if skill.description %}
-                                <p class="text-sm text-gray-500">{{ skill.description }}</p>
-                                {% endif %}
+    <!-- About Section -->
+    <section id="about" class="py-32 bg-gray-50" data-scroll-section>
+        <div class="container mx-auto px-4">
+            <div class="max-w-6xl mx-auto">
+                <!-- Section Header -->
+                <div class="text-center mb-20" data-aos="fade-up">
+                    <h4 class="text-primary font-medium mb-2">About Me</h4>
+                    <h2 class="text-4xl md:text-5xl font-bold text-dark mb-4">Empowering Businesses Through <br> Smart IT & Zoho Solutions</h2>
+                    <div class="w-24 h-1 bg-primary mx-auto"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                    <!-- Left Column: About Content -->
+                    <div data-aos="fade-right">
+                        <!-- Profile Image -->
+                        <div class="mb-12 relative group">
+                            <div class="absolute -inset-4 bg-primary rounded-2xl opacity-50 blur-lg group-hover:opacity-75 transition-all duration-500"></div>
+                            <div class="relative w-48 h-48 mx-auto overflow-hidden rounded-2xl mb-8">
+                                <img src="{{ url_for('static', filename='MYPROFILE.jpg') }}" 
+                                     alt="Stephen Awili" 
+                                     class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
                             </div>
                         </div>
-                        {% endfor %}
+
+                        <div class="mb-8">
+                            <h3 class="text-2xl font-bold text-dark mb-4">Delivering Integrated Solutions</h3>
+                            <p class="text-body mb-6">As an IT Specialist and Zoho consultant, I help organizations automate workflows, customize CRM systems, and build dashboards that drive decisions.</p>
+                            <p class="text-body">My work combines Zoho platform customization, Deluge scripting, and Python automation to solve operational problems and unlock growth.</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-8 mt-8">
+                            <div class="text-center p-6 bg-white rounded-xl shadow-lg hover:transform hover:-translate-y-2 transition-all duration-300">
+                                <h4 class="text-4xl font-bold text-primary mb-2">1+</h4>
+                                <p class="text-dark">Years Experience</p>
+                            </div>
+                            <div class="text-center p-6 bg-white rounded-xl shadow-lg hover:transform hover:-translate-y-2 transition-all duration-300">
+                                <h4 class="text-4xl font-bold text-primary mb-2">5+</h4>
+                                <p class="text-dark">Projects Completed</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Skills -->
+                    <div data-aos="fade-left">
+                        <div class="bg-white p-8 rounded-2xl shadow-xl">
+                            <h3 class="text-2xl font-bold text-dark mb-8">Core Skills</h3>
+                            <div class="space-y-6">
+                                {% for skill in skills %}
+                                <div class="skill-item" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <h4 class="text-lg font-medium text-dark">{{ skill.name }}</h4>
+                                    </div>
+                                    {% if skill.description %}
+                                    <p class="text-body text-sm mb-2">{{ skill.description }}</p>
+                                    {% endif %}
+                                    <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                                        <div class="h-full bg-primary rounded-full" style="width: 85%"></div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+
+<!-- Projects Section -->
+<section id="work" class="py-32 bg-white" data-scroll-section>
+    <div class="container mx-auto px-4">
+        <div class="max-w-6xl mx-auto">
+            <!-- Section Header -->
+            <div class="text-center mb-20" data-aos="fade-up">
+                <h4 class="text-primary font-medium mb-2">Latest Work</h4>
+                <h2 class="text-4xl md:text-5xl font-bold text-dark mb-4">Featured Projects</h2>
+                <p class="text-xl text-body max-w-2xl mx-auto">Recent work and case studies demonstrating practical business value.</p>
+                <div class="w-24 h-1 bg-primary mx-auto mt-6"></div>
+            </div>
+
+            <!-- Projects Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {% for project in latest_projects %}
+                <div class="group" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                    <div class="relative overflow-hidden rounded-2xl shadow-xl">
+                        <!-- Project Image -->
+                        <div class="relative h-80 overflow-hidden">
+                            <img src="{{ url_for('get_image', model_name='project', image_id=project.id) }}" 
+                                 alt="{{ project.title }}" 
+                                 class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
+                            <!-- Overlay -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                                <div class="p-8">
+                                    <h3 class="text-white text-2xl font-bold mb-2">{{ project.title }}</h3>
+                                    <p class="text-gray-200 text-sm mb-4">{{ project.description | striptags | truncate(100, True, '...') }}</p>
+                                    <!-- Skills Tags -->
+                                    <div class="flex flex-wrap gap-2 mb-4">
+                                        {% for s in project.subskills %}
+                                        <span class="px-3 py-1 bg-white/20 text-white rounded-full text-sm backdrop-blur-sm">{{ s.name }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    <a href="{{ url_for('project_detail', slug=project.slug) }}" 
+                                       class="inline-block bg-primary text-white px-6 py-3 rounded-lg transform hover:-translate-y-1 transition-all duration-300">
+                                        View Project
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- View All Button -->
+            <div class="text-center mt-16" data-aos="fade-up">
+                <a href="{{ url_for('portfolio') }}" 
+                   class="btn-primary inline-flex items-center gap-2 transform hover:-translate-y-1 transition-all duration-300">
+                    View All Projects
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </a>
             </div>
         </div>
     </div>
 </section>
 
-
-<!-- Projects (latest) -->
-<section id="work" class="py-20 bg-white">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold mb-4" data-aos="fade-up">My Projects</h2>
-            <p class="text-gray-600 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">Recent work and case studies demonstrating practical business value.</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {% for project in latest_projects %}
-            <div class="project-card bg-white rounded-xl overflow-hidden shadow-md transition duration-300" data-aos="fade-up">
-                <div class="h-64 bg-gray-100 overflow-hidden">
-                    <img src="{{ url_for('get_image', model_name='project', image_id=project.id) }}" alt="{{ project.title }}" class="w-full h-full object-cover">
-                </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-bold mb-2">{{ project.title }}</h3>
-                    <p class="text-gray-600 mb-4">{{ project.description | striptags | truncate(140, True, '...') }}</p>
-                    <div class="flex flex-wrap gap-2 mb-4">
-                        {% for s in project.subskills %}
-                        <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">{{ s.name }}</span>
-                        {% endfor %}
-                    </div>
-                    <a href="{{ url_for('project_detail', slug=project.slug) }}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-full text-sm hover:bg-blue-700 transition-colors shadow-md">View Project</a>
-                </div>
+<!-- Blog Section -->
+<section id="blog-latest" class="py-32 bg-gray-50" data-scroll-section>
+    <div class="container mx-auto px-4">
+        <div class="max-w-6xl mx-auto">
+            <!-- Section Header -->
+            <div class="text-center mb-20" data-aos="fade-up">
+                <h4 class="text-primary font-medium mb-2">Latest Updates</h4>
+                <h2 class="text-4xl md:text-5xl font-bold text-dark mb-4">Blog & Insights</h2>
+                <p class="text-xl text-body max-w-2xl mx-auto">Technical insights, case studies, and industry updates.</p>
+                <div class="w-24 h-1 bg-primary mx-auto mt-6"></div>
             </div>
-            {% endfor %}
-        </div>
 
-        <div class="text-center mt-12" data-aos="fade-up">
-            <a href="{{ url_for('portfolio') }}" class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-md hover:bg-gray-50 transition">View All Projects</a>
-        </div>
-    </div>
-</section>
-
-
-<!-- Latest Blog Posts -->
-<section id="blog-latest" class="py-20 bg-white">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold mb-4" data-aos="fade-up">Latest Blog Posts</h2>
-            <p class="text-gray-600 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">Insights, case studies and technical notes.</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {% for post in latest_blogs %}
-            <div class="project-card bg-white rounded-xl overflow-hidden shadow-md transition duration-300" data-aos="fade-up">
-                <div class="h-64 bg-gray-100 overflow-hidden">
-                    <img src="{{ url_for('get_image', model_name='blog', image_id=post.id) }}" alt="{{ post.title }}" class="w-full h-full object-cover">
-                </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-bold mb-2">{{ post.title }}</h3>
-                    <p class="text-gray-600 mb-4">{{ post.content | striptags | truncate(140, True, '...') }}</p>
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-500">{{ post.date_posted.strftime('%B %d, %Y') }}</span>
-                        <a href="{{ url_for('blog_post', slug=post.slug) }}" class="text-blue-600 hover:text-blue-800 font-medium">Read More</a>
+            <!-- Blog Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {% for post in latest_blogs %}
+                <article class="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:-translate-y-2 transition-all duration-300" 
+                         data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                    <!-- Blog Image -->
+                    <div class="relative h-64 overflow-hidden">
+                        <img src="{{ url_for('get_image', model_name='blog', image_id=post.id) }}" 
+                             alt="{{ post.title }}" 
+                             class="w-full h-full object-cover">
+                        <!-- Date Badge -->
+                        <div class="absolute top-4 left-4 bg-primary text-white px-4 py-2 rounded-lg">
+                            {{ post.date_posted.strftime('%b %d, %Y') }}
+                        </div>
                     </div>
-                </div>
+                    <!-- Content -->
+                    <div class="p-8">
+                        <h3 class="text-2xl font-bold text-dark mb-4 line-clamp-2">{{ post.title }}</h3>
+                        <p class="text-body mb-6 line-clamp-3">{{ post.content | striptags | truncate(140, True, '...') }}</p>
+                        <div class="flex items-center justify-between">
+                            <a href="{{ url_for('blog_post', slug=post.slug) }}" 
+                               class="text-primary font-medium hover:text-dark transition-colors duration-300 flex items-center gap-2">
+                                Read More
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
             </div>
-            {% endfor %}
-        </div>
 
-        <div class="text-center mt-12" data-aos="fade-up">
-            <a href="{{ url_for('blog') }}" class="inline-block bg-blue-700 text-white px-8 py-3 rounded-full text-lg font-semibold shadow-lg transition-all duration-300 transform hover:scale-105">View All Posts</a>
+            <!-- View All Button -->
+            <div class="text-center mt-16" data-aos="fade-up">
+                <a href="{{ url_for('blog') }}" 
+                   class="btn-primary inline-flex items-center gap-2 transform hover:-translate-y-1 transition-all duration-300">
+                    View All Posts
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+            </div>
         </div>
     </div>
 </section>
 
 
 <!-- Contact Section -->
-<section id="contact" class="py-20 bg-white">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold mb-4">Get in Touch</h2>
-            <p class="text-gray-600 max-w-2xl mx-auto">Have a project in mind or want to collaborate? I'd love to hear from you.</p>
-        </div>
+<section id="contact" class="py-32 bg-white relative overflow-hidden" data-scroll-section>
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 bg-pattern opacity-5"></div>
+    
+    <div class="container mx-auto px-4 relative z-10">
+        <div class="max-w-6xl mx-auto">
+            <!-- Section Header -->
+            <div class="text-center mb-20" data-aos="fade-up">
+                <h4 class="text-primary font-medium mb-2">Contact Me</h4>
+                <h2 class="text-4xl md:text-5xl font-bold text-dark mb-4">Let's Work Together</h2>
+                <p class="text-xl text-body max-w-2xl mx-auto">Have a project in mind or want to collaborate? I'd love to hear from you.</p>
+                <div class="w-24 h-1 bg-primary mx-auto mt-6"></div>
+            </div>
 
-        <div class="max-w-2xl mx-auto">
-            <form method="POST" action="{{ url_for('contact') }}" class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                        <input name="name" type="text" id="name" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" required>
+            <!-- Contact Form -->
+            <div class="max-w-3xl mx-auto">
+                <div class="bg-white rounded-2xl shadow-2xl p-8 md:p-12" data-aos="fade-up">
+                    <form method="POST" action="{{ url_for('contact') }}" class="space-y-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <!-- Name Field -->
+                            <div class="relative">
+                                <label for="name" class="block text-sm font-medium text-dark mb-2">Your Name</label>
+                                <input name="name" type="text" id="name" required
+                                       class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-lg focus:outline-none focus:border-primary transition-colors duration-300">
+                            </div>
+                            
+                            <!-- Email Field -->
+                            <div class="relative">
+                                <label for="email" class="block text-sm font-medium text-dark mb-2">Your Email</label>
+                                <input name="email" type="email" id="email" required
+                                       class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-lg focus:outline-none focus:border-primary transition-colors duration-300">
+                            </div>
+                        </div>
+
+                        <!-- Subject Field -->
+                        <div class="relative">
+                            <label for="subject" class="block text-sm font-medium text-dark mb-2">Subject</label>
+                            <input name="subject" type="text" id="subject"
+                                   class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-lg focus:outline-none focus:border-primary transition-colors duration-300">
+                        </div>
+
+                        <!-- Message Field -->
+                        <div class="relative">
+                            <label for="message" class="block text-sm font-medium text-dark mb-2">Your Message</label>
+                            <textarea name="message" id="message" rows="6" required
+                                      class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-lg focus:outline-none focus:border-primary transition-colors duration-300 resize-none"></textarea>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="text-center">
+                            <button type="submit"
+                                    class="btn-primary inline-block min-w-[200px] text-center transform hover:-translate-y-1 transition-all duration-300">
+                                Send Message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Contact Info Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+                    <!-- Email -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg text-center" data-aos="fade-up" data-aos-delay="100">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-envelope text-2xl text-primary"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-dark mb-2">Email</h4>
+                        <a href="mailto:awilisteve076@gmail.com" class="text-body hover:text-primary transition-colors duration-300">
+                            awilisteve076@gmail.com
+                        </a>
                     </div>
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <input name="email" type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" required>
+
+                    <!-- Phone -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg text-center" data-aos="fade-up" data-aos-delay="200">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-phone text-2xl text-primary"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-dark mb-2">Phone</h4>
+                        <a href="tel:+254708157774" class="text-body hover:text-primary transition-colors duration-300">
+                            +254 705360439                       
+                        </a>
+                    </div>
+
+                    <!-- Location -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg text-center" data-aos="fade-up" data-aos-delay="300">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-map-marker-alt text-2xl text-primary"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-dark mb-2">Location</h4>
+                        <p class="text-body">Nairobi, Kenya</p>
                     </div>
                 </div>
-                <div>
-                    <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
-                    <input name="subject" type="text" id="subject" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-                <div>
-                    <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Message</label>
-                    <textarea name="message" id="message" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" required></textarea>
-                </div>
-                <div>
-                    <button type="submit" class="w-full px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">Send Message</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </section>

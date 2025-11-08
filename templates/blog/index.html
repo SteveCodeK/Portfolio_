@@ -1,54 +1,133 @@
-{# templates/post.html (for the blog list page) #}
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-4xl font-bold text-gray-900 mb-8 text-center">My Blog Posts</h1>
-
-    <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-        {% for post in blog_posts.items %}
-        <div class="bg-white rounded-lg shadow-md overflow-hidden transform transition-transform duration-300 hover:scale-105">
-            {# Display Blog Post Image #}
-                <img src="{{ url_for('get_image', model_name='blog', image_id=post.id) }}" alt="{{ post.title }}" class="w-full h-48 object-cover" loading="lazy">
-            <div class="p-6">
-                <h2 class="text-2xl font-semibold text-gray-900 mb-2">{{ post.title }}</h2>
-                <p class="text-gray-600 text-sm mb-4">Published on {{ post.date_posted.strftime('%B %d, %Y') }}</p>
-                {# Use post.content and apply truncate and striptags #}
-                {# Strip tags before truncating to avoid breaking HTML and counting tags in length #}
-                <p class="text-gray-700 text-base mb-4">{{ post.content | striptags | truncate(150, True, '...') }}</p>
-                <a href="{{ url_for('blog_post', slug=post.slug) }}" class="inline-block text-blue-600 hover:text-blue-800 font-medium">Read More &rarr;</a>
+<div data-scroll-container>
+    <!-- Blog Header Section -->
+    <section class="pt-32 pb-16 bg-gray-50 relative overflow-hidden" data-scroll-section>
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 bg-pattern opacity-5"></div>
+        
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="max-w-4xl mx-auto text-center">
+                <h4 class="text-primary font-medium mb-4" data-aos="fade-up">Blog & Insights</h4>
+                <h1 class="text-4xl md:text-6xl font-bold text-dark mb-6" data-aos="fade-up" data-aos-delay="100">
+                    Latest Articles & News
+                </h1>
+                <p class="text-xl text-body max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="200">
+                    Dive into technical insights, case studies, and industry updates about Zoho development, Python automation, and IT solutions.
+                </p>
             </div>
         </div>
-        {% else %}
-        <p class="col-span-full text-center text-gray-500">No blog posts found yet.</p>
-        {% endfor %}
-    </div>
+    </section>
 
-    {# Pagination Controls #}
-    <div class="flex justify-center mt-10 space-x-2">
-        {% if blog_posts.has_prev %}
-        <a href="{{ url_for('blog', page=blog_posts.prev_num) }}" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">&laquo; Previous</a>
-        {% else %}
-        <span class="px-4 py-2 bg-gray-300 text-gray-600 rounded-md cursor-not-allowed">&laquo; Previous</span>
-        {% endif %}
+    <!-- Blog Grid Section -->
+    <section class="py-20" data-scroll-section>
+        <div class="container mx-auto px-4">
+            <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                {% for post in blog_posts.items %}
+                <article class="group bg-white rounded-2xl shadow-xl overflow-hidden transform hover:-translate-y-2 transition-all duration-500" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                    <!-- Blog Image -->
+                    <div class="relative h-64 overflow-hidden">
+                        <img src="{{ url_for('get_image', model_name='blog', image_id=post.id) }}" 
+                             alt="{{ post.title }}" 
+                             class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                             loading="lazy">
+                        <!-- Date Badge -->
+                        <div class="absolute top-4 left-4 bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium">
+                            {{ post.date_posted.strftime('%b %d, %Y') }}
+                        </div>
+                    </div>
 
-        {% for page_num in blog_posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
-        {% if page_num %}
-        {% if blog_posts.page == page_num %}
-        <span class="px-4 py-2 bg-blue-700 text-white rounded-md">{{ page_num }}</span>
-        {% else %}
-        <a href="{{ url_for('blog', page=page_num) }}" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">{{ page_num }}</a>
-        {% endif %}
-        {% else %}
-        <span class="px-4 py-2 text-gray-500">...</span>
-        {% endif %}
-        {% endfor %}
+                    <!-- Content -->
+                    <div class="p-8">
+                        <h2 class="text-2xl font-bold text-dark mb-4 line-clamp-2 group-hover:text-primary transition-colors duration-300">
+                            {{ post.title }}
+                        </h2>
+                        <p class="text-body mb-6 line-clamp-3">
+                            {{ post.content | striptags | truncate(150, True, '...') }}
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <a href="{{ url_for('blog_post', slug=post.slug) }}" 
+                               class="inline-flex items-center text-primary font-medium hover:text-dark transition-colors duration-300">
+                                Read More
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 transform group-hover:translate-x-1 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                {% else %}
+                <div class="col-span-full text-center py-20" data-aos="fade-up">
+                    <div class="max-w-md mx-auto">
+                        <i class="fas fa-pencil-alt text-6xl text-primary mb-6"></i>
+                        <h3 class="text-2xl font-bold text-dark mb-4">No Posts Yet</h3>
+                        <p class="text-body">Stay tuned! We'll be adding interesting articles soon.</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
 
-        {% if blog_posts.has_next %}
-        <a href="{{ url_for('blog', page=blog_posts.next_num) }}" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">Next &raquo;</a>
-        {% else %}
-        <span class="px-4 py-2 bg-gray-300 text-gray-600 rounded-md cursor-not-allowed">Next &raquo;</span>
-        {% endif %}
-    </div>
+    <!-- Pagination Section -->
+    <section class="py-12 bg-gray-50" data-scroll-section>
+        <div class="container mx-auto px-4">
+            <div class="flex justify-center items-center space-x-2" data-aos="fade-up">
+                {% if blog_posts.has_prev %}
+                <a href="{{ url_for('blog', page=blog_posts.prev_num) }}" 
+                   class="inline-flex items-center px-6 py-3 bg-white border-2 border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition-all duration-300 transform hover:-translate-y-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Previous
+                </a>
+                {% else %}
+                <span class="inline-flex items-center px-6 py-3 bg-gray-100 text-gray-400 rounded-lg cursor-not-allowed">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Previous
+                </span>
+                {% endif %}
+
+                <div class="hidden md:flex items-center space-x-2">
+                    {% for page_num in blog_posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                    {% if page_num %}
+                    {% if blog_posts.page == page_num %}
+                    <span class="inline-flex items-center justify-center w-10 h-10 bg-primary text-white rounded-lg font-medium">
+                        {{ page_num }}
+                    </span>
+                    {% else %}
+                    <a href="{{ url_for('blog', page=page_num) }}" 
+                       class="inline-flex items-center justify-center w-10 h-10 bg-white border-2 border-gray-200 text-body rounded-lg hover:border-primary hover:text-primary transition-colors duration-300">
+                        {{ page_num }}
+                    </a>
+                    {% endif %}
+                    {% else %}
+                    <span class="inline-flex items-center justify-center w-10 h-10 text-body">...</span>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+
+                {% if blog_posts.has_next %}
+                <a href="{{ url_for('blog', page=blog_posts.next_num) }}" 
+                   class="inline-flex items-center px-6 py-3 bg-white border-2 border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition-all duration-300 transform hover:-translate-y-1">
+                    Next
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+                {% else %}
+                <span class="inline-flex items-center px-6 py-3 bg-gray-100 text-gray-400 rounded-lg cursor-not-allowed">
+                    Next
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </span>
+                {% endif %}
+            </div>
+        </div>
+    </section>
 </div>
 {% endblock %}

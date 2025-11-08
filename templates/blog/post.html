@@ -11,92 +11,194 @@
 {{ url_for('get_image', model_name='blog', image_id=post.id, _external=True) }}
 {% endblock %}
 
-
 {% block content %}
-<div class="container mx-auto px-4 py-16 md:py-24 max-w-3xl">
-    <article class="bg-white rounded-lg shadow-lg p-8">
-        <h1 class="text-4xl md:text-5xl font-extrabold text-blue-800 mb-6 text-center leading-tight">
-            {{ post.title }}
-        </h1>
-        <p class="text-gray-500 text-sm mb-8 text-center">
-            Published on {{ post.date_posted.strftime('%B %d, %Y') }}
-        </p>
+<div data-scroll-container>
+    <!-- Blog Post Hero -->
+    <section class="relative pt-32 pb-16 bg-gray-50 overflow-hidden" data-scroll-section>
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto">
+                <!-- Back to Blog -->
+                <div class="mb-8" data-aos="fade-right">
+                    <a href="{{ url_for('blog') }}" class="inline-flex items-center text-primary hover:text-dark transition-colors duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                        </svg>
+                        Back to Blog
+                    </a>
+                </div>
 
-        {# Display Featured Image for Blog Post #}
-        <div class="mb-8 text-center">
-            <img src="{{ url_for('get_image', model_name='blog', image_id=post.id) }}" alt="{{ post.title }}" class="w-full h-auto max-h-96 object-cover rounded-lg shadow-md mx-auto">
+                <!-- Post Header -->
+                <header class="text-center mb-12">
+                    <h1 class="text-4xl md:text-6xl font-bold text-dark mb-6 leading-tight" data-aos="fade-up">
+                        {{ post.title }}
+                    </h1>
+                    <div class="flex items-center justify-center space-x-4 text-body" data-aos="fade-up" data-aos-delay="100">
+                        <div class="flex items-center">
+                            <i class="far fa-calendar-alt mr-2 text-primary"></i>
+                            <time datetime="{{ post.date_posted.strftime('%Y-%m-%d') }}">
+                                {{ post.date_posted.strftime('%B %d, %Y') }}
+                            </time>
+                        </div>
+                        <span class="text-gray-300">•</span>
+                        <div class="flex items-center">
+                            <i class="far fa-clock mr-2 text-primary"></i>
+                            <span>5 min read</span>
+                        </div>
+                    </div>
+                </header>
+            </div>
         </div>
+    </section>
 
-        <div class="prose max-w-none text-gray-700 leading-relaxed text-lg">
-            {# The 'content' field will likely contain HTML, so use 'safe' filter #}
-            {{ post.content | safe }}
-        </div>
-        <h3>Leave a Comment</h3>
-        <div class="max-w-3xl mx-auto bg-white shadow-lg rounded-2xl p-6 mt-10">
-            <h2 class="text-2xl font-bold text-green-700 mb-4">Leave Feedback</h2>
-
-            {% if form %}
-            <form method="POST" class="space-y-4">
-                {{ form.hidden_tag() }}
-
-                <div>
-                    {{ form.guest_name.label(class="block text-sm font-medium text-gray-700") }}
-                    {{ form.guest_name(class="w-full mt-1 p-2 border rounded-lg", placeholder="Your name") }}
-                </div>
-                <div>
-                    {{ form.guest_email.label(class="block text-sm font-medium text-gray-700") }}
-                    {{ form.guest_email(class="w-full mt-1 p-2 border rounded-lg", placeholder="you@example.com") }}
+    <!-- Blog Post Content -->
+    <section class="py-16" data-scroll-section>
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto">
+                <!-- Featured Image -->
+                <div class="mb-12 rounded-2xl overflow-hidden shadow-xl" data-aos="fade-up">
+                    <img src="{{ url_for('get_image', model_name='blog', image_id=post.id) }}" 
+                         alt="{{ post.title }}" 
+                         class="w-full h-auto object-cover">
                 </div>
 
-                <div>
-                    {{ form.content.label(class="block text-sm font-medium text-gray-700") }}
-                    {{ form.content(class="w-full mt-1 p-2 border rounded-lg", rows="4", placeholder="Write your comment...") }}
-                </div>
+                <!-- Post Content -->
+                <article class="prose prose-lg max-w-none" data-aos="fade-up">
+                    <!-- Add custom styles for blog content -->
+                    <style>
+                        .prose h2 {
+                            color: var(--color-dark);
+                            font-size: 2rem;
+                            margin-top: 2.5rem;
+                            margin-bottom: 1.5rem;
+                        }
+                        .prose p {
+                            color: var(--color-body);
+                            line-height: 1.8;
+                            margin-bottom: 1.5rem;
+                        }
+                        .prose a {
+                            color: var(--color-primary);
+                            text-decoration: none;
+                        }
+                        .prose a:hover {
+                            text-decoration: underline;
+                        }
+                        .prose blockquote {
+                            border-left: 4px solid var(--color-primary);
+                            padding-left: 1.5rem;
+                            font-style: italic;
+                            color: var(--color-body);
+                        }
+                        .prose code {
+                            background-color: #f8f9fa;
+                            padding: 0.2rem 0.4rem;
+                            border-radius: 0.25rem;
+                            font-size: 0.875em;
+                        }
+                        .prose pre {
+                            background-color: #f8f9fa;
+                            padding: 1.5rem;
+                            border-radius: 0.5rem;
+                            overflow-x: auto;
+                        }
+                    </style>
+                    {{ post.content | safe }}
+                </article>
+                <!-- Comments Section -->
+                <div class="mt-16 border-t border-gray-100 pt-16" data-aos="fade-up">
+                    <h3 class="text-2xl font-bold text-dark mb-8">Discussion</h3>
+                    
+                    <!-- Comment Form -->
+                    <div class="bg-gray-50 rounded-2xl p-8 mb-12">
+                        <h4 class="text-xl font-bold text-dark mb-6">Leave a Comment</h4>
+                        
+                        {% if form %}
+                        <form method="POST" class="space-y-6">
+                            {{ form.hidden_tag() }}
 
-                <!-- Rating (use WTForms field if available) -->
-                <div>
-                    {{ form.rating.label(class="block text-sm font-medium text-gray-700") }}
-                    <div class="flex items-center space-x-2 mt-2">
-                        {% for subfield in form.rating %}
-                            <label class="cursor-pointer text-2xl text-gray-300 peer-checked:text-yellow-400">{{ subfield }}&#9733;</label>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Name Field -->
+                                <div>
+                                    {{ form.guest_name.label(class="block text-sm font-medium text-dark mb-2") }}
+                                    {{ form.guest_name(class="w-full px-4 py-3 bg-white border-2 border-gray-100 rounded-lg focus:outline-none focus:border-primary transition-colors duration-300", placeholder="Your name") }}
+                                </div>
+
+                                <!-- Email Field -->
+                                <div>
+                                    {{ form.guest_email.label(class="block text-sm font-medium text-dark mb-2") }}
+                                    {{ form.guest_email(class="w-full px-4 py-3 bg-white border-2 border-gray-100 rounded-lg focus:outline-none focus:border-primary transition-colors duration-300", placeholder="you@example.com") }}
+                                </div>
+                            </div>
+
+                            <!-- Comment Field -->
+                            <div>
+                                {{ form.content.label(class="block text-sm font-medium text-dark mb-2") }}
+                                {{ form.content(class="w-full px-4 py-3 bg-white border-2 border-gray-100 rounded-lg focus:outline-none focus:border-primary transition-colors duration-300", rows="4", placeholder="Write your comment...") }}
+                            </div>
+
+                            <!-- Rating -->
+                            <div>
+                                {{ form.rating.label(class="block text-sm font-medium text-dark mb-2") }}
+                                <div class="flex items-center space-x-2">
+                                    {% for subfield in form.rating %}
+                                    <label class="cursor-pointer text-2xl transition-colors duration-300 hover:text-primary">
+                                        {{ subfield }}
+                                        <span class="star {% if loop.index <= 5 %}text-yellow-400{% else %}text-gray-300{% endif %}">★</span>
+                                    </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- Submit Buttons -->
+                            <div class="flex items-center gap-4">
+                                <button type="submit" onclick="document.getElementById('likeField').value='true';" 
+                                        class="inline-flex items-center px-6 py-3 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors duration-300">
+                                    <i class="fas fa-heart mr-2"></i> Like
+                                </button>
+                                {{ form.like(id='likeField') }}
+                                {{ form.submit(class="btn-primary px-8 py-3") }}
+                            </div>
+                        </form>
+                        {% else %}
+                        <p class="text-body">Comments are available when commenting is enabled. Please view this post through the site to submit feedback.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Comments List -->
+                    <div class="space-y-8">
+                        <h4 class="text-xl font-bold text-dark mb-6">{{ post.comments|length }} Comments</h4>
+                        
+                        {% for comment in post.comments %}
+                        <div class="bg-gray-50 rounded-2xl p-6 transform hover:-translate-y-1 transition-all duration-300" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                            <div class="flex items-start gap-4">
+                                <!-- Avatar -->
+                                <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <span class="text-primary font-medium">{{ (comment.user.username if comment.user else comment.guest_name or "Anonymous")[0]|upper }}</span>
+                                </div>
+                                
+                                <div class="flex-1">
+                                    <!-- Comment Header -->
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h5 class="font-bold text-dark">
+                                            {{ comment.user.username if comment.user else comment.guest_name or "Anonymous" }}
+                                        </h5>
+                                        <time class="text-sm text-body" datetime="{{ comment.date_posted.strftime('%Y-%m-%d') }}">
+                                            {{ comment.date_posted.strftime('%B %d, %Y') }}
+                                        </time>
+                                    </div>
+                                    
+                                    <!-- Comment Content -->
+                                    <p class="text-body">{{ comment.content }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <p class="text-body text-center py-8">No comments yet. Be the first to share your thoughts!</p>
                         {% endfor %}
                     </div>
                 </div>
-
-                <!-- Like Button -->
-                <div class="flex items-center gap-3">
-                    <button type="submit" onclick="document.getElementById('likeField').value='true';" class="flex items-center px-4 py-2 bg-pink-500 text-white rounded-lg shadow hover:bg-pink-600">❤️ Like</button>
-                    {{ form.like(id='likeField') }}
-                    <div class="flex-1">
-                        {{ form.submit(class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700") }}
-                    </div>
-                </div>
-            </form>
-            {% else %}
-            <p class="text-gray-600">Comments are available when commenting is enabled. Please view this post through the site to submit feedback.</p>
-            {% endif %}
-        </div>
-        <div class="max-w-3xl mx-auto mt-8">
-            <h3 class="text-xl font-semibold mb-4 text-green-700">Comments</h3>
-            {% for comment in post.comments %}
-            <div class="bg-gray-100 p-4 rounded-lg mb-3">
-                <p class="font-medium text-gray-800">
-                    {{ comment.user.username if comment.user else comment.guest_name or "Anonymous" }}
-                </p>
-                <p class="text-gray-600">{{ comment.content }}</p>
-                <p class="text-sm text-gray-500">Posted on {{ comment.date_posted.strftime('%Y-%m-%d %H:%M') }}</p>
             </div>
-            {% else %}
-            <p class="text-gray-500">No comments yet. Be the first!</p>
-            {% endfor %}
         </div>
-
-
-        <div class="mt-12 text-center">
-            <a href="{{ url_for('blog') }}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-                &larr; Back to Blog Posts
-            </a>
-        </div>
-    </article>
+    </section>
 </div>
 {% endblock %}
