@@ -1,0 +1,39 @@
+<nav class="bg-white shadow-sm p-4 sticky top-0 z-50 rounded-b-lg">
+    <div class="container mx-auto flex justify-between items-center">
+        <a href="{{ url_for('home') }}" class="text-2xl font-bold text-blue-700 rounded-md p-2 hover:bg-blue-50 transition-colors">
+            Stephen Awili
+        </a>
+
+        <button id="menu-toggle" class="md:hidden text-gray-600 hover:text-blue-700 focus:outline-none">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+            </svg>
+        </button>
+
+        <div id="desktop-menu" class="hidden md:flex space-x-4">
+            <a href="{{ url_for('home') }}#about" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">About</a>
+            <a href="{{ url_for('home') }}#skills" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">Skills</a>
+            <a href="{{ url_for('portfolio') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">Portfolio</a>
+            <a href="{{ url_for('blog') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">Blog</a>
+            <a href="{{ url_for('home') }}#contact" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">Contact</a>
+
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('admin.dashboard') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">Admin</a>
+            <a href="{{ url_for('auth.logout') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50">Logout</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="mobile-menu" class="hidden md:hidden flex flex-col items-center py-4 space-y-3 bg-white border-t border-gray-200">
+        <a href="{{ url_for('home') }}#about" class="nav-link text-gray-600 hover:text-blue-700 transition-colors w-full text-center py-2 rounded-md hover:bg-blue-50">About</a>
+        <a href="{{ url_for('home') }}#skills" class="nav-link text-gray-600 hover:text-blue-700 transition-colors w-full text-center py-2 rounded-md hover:bg-blue-50">Skills</a>
+        <a href="{{ url_for('portfolio') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors w-full text-center py-2 rounded-md hover:bg-blue-50">Portfolio</a>
+        <a href="{{ url_for('blog') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors w-full text-center py-2 rounded-md hover:bg-blue-50">Blog</a>
+        <a href="{{ url_for('home') }}#contact" class="nav-link text-gray-600 hover:text-blue-700 transition-colors w-full text-center py-2 rounded-md hover:bg-blue-50">Contact</a>
+
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('admin.dashboard') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors w-full text-center py-2 rounded-md hover:bg-blue-50">Admin</a>
+        <a href="{{ url_for('auth.logout') }}" class="nav-link text-gray-600 hover:text-blue-700 transition-colors w-full text-center py-2 rounded-md hover:bg-blue-50">Logout</a>
+        {% endif %}
+    </div>
+</nav>

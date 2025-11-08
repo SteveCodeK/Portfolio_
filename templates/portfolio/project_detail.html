@@ -25,11 +25,11 @@
         </div>
 
         <div class="prose max-w-none text-gray-700 leading-relaxed text-lg mb-8">
-            {# Use project.content here, and always apply |safe for HTML content #}
-            {{ project.description | safe }}
+            {# Description is usually plain text — escape then show. Use safe only for HTML content fields. #}
+                {{ project.description | e }}
         </div>
         <div class="prose max-w-none text-gray-700 leading-relaxed text-lg mb-8">
-            {# Use project.content here, and always apply |safe for HTML content #}
+            {# Use project.content here; content is expected to contain HTML (created via admin), so render safely. #}
             {{ project.content | safe }}
         </div>
 
@@ -69,54 +69,48 @@
         <div class="max-w-3xl mx-auto bg-white shadow-lg rounded-2xl p-6 mt-10">
             <h2 class="text-2xl font-bold text-green-700 mb-4">Leave Feedback</h2>
 
+            {% if form %}
             <form method="POST" class="space-y-4">
                 {{ form.hidden_tag() }}
 
                 <div>
                     {{ form.guest_name.label(class="block text-sm font-medium text-gray-700") }}
-                    {{ form.guest_name(class="w-full mt-1 p-2 border rounded-lg") }}
+                    {{ form.guest_name(class="w-full mt-1 p-2 border rounded-lg", placeholder="Your name") }}
                 </div>
                 <div>
                     {{ form.guest_email.label(class="block text-sm font-medium text-gray-700") }}
-                    {{ form.guest_email(class="w-full mt-1 p-2 border rounded-lg") }}
+                    {{ form.guest_email(class="w-full mt-1 p-2 border rounded-lg", placeholder="you@example.com") }}
                 </div>
 
                 <div>
                     {{ form.content.label(class="block text-sm font-medium text-gray-700") }}
-                    {{ form.content(class="w-full mt-1 p-2 border rounded-lg", rows="4") }}
+                    {{ form.content(class="w-full mt-1 p-2 border rounded-lg", rows="4", placeholder="Write your feedback...") }}
                 </div>
 
-                <!-- Rating (Stars) -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Rate this</label>
+                    {{ form.rating.label(class="block text-sm font-medium text-gray-700") }}
                     <div class="flex items-center space-x-2 mt-2">
-                        {% for i in range(1,6) %}
-                        <input type="radio" id="star{{i}}" name="rating" value="{{i}}" class="hidden peer" />
-                        <label for="star{{i}}" class="cursor-pointer text-2xl text-gray-300 peer-checked:text-yellow-400">★</label>
-                        {% endfor %}
+                        {# Render rating as a numeric input (1-5) rather than iterating over
+                           an IntegerField which is not iterable. This keeps the form simple
+                           and prevents template runtime errors. #}
+                        {{ form.rating(class="w-24 px-3 py-2 border rounded-lg", min=1, max=5, placeholder="1-5") }}
+                        <small class="text-sm text-gray-500">Rate 1 (low) — 5 (high)</small>
                     </div>
                 </div>
 
-                <!-- Like Button -->
-                <div>
-                    <button type="submit" onclick="document.getElementById('likeField').value='true';"
-                            class="flex items-center px-4 py-2 bg-pink-500 text-white rounded-lg shadow hover:bg-pink-600">
-                        ❤️ Like
-                    </button>
-                    {{ form.like(id="likeField") }}
+                <div class="flex items-center gap-3">
+                    <button type="submit" onclick="document.getElementById('likeField').value='true';" class="flex items-center px-4 py-2 bg-pink-500 text-white rounded-lg shadow hover:bg-pink-600">❤️ Like</button>
+                    {{ form.like(id='likeField') }}
+                    <div class="flex-1">
+                        {{ form.submit(class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700") }}
+                    </div>
                 </div>
-                <div>
-                    <button type="submit" class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700">
-                        Submit Feedback
-                    </button>
-                </div>
+
                 <div class="max-w-3xl mx-auto mt-8">
                     <h3 class="text-xl font-semibold mb-4 text-green-700">Comments</h3>
                     {% for comment in project.comments %}
                     <div class="bg-gray-100 p-4 rounded-lg mb-3">
-                        <p class="font-medium text-gray-800">
-                            {{ comment.user.username if comment.user else comment.guest_name or "Anonymous" }}
-                        </p>
+                        <p class="font-medium text-gray-800">{{ comment.user.username if comment.user else comment.guest_name or "Anonymous" }}</p>
                         <p class="text-gray-600">{{ comment.content }}</p>
                         <p class="text-sm text-gray-500">Posted on {{ comment.date_posted.strftime('%Y-%m-%d %H:%M') }}</p>
                     </div>
@@ -126,6 +120,9 @@
                 </div>
 
             </form>
+            {% else %}
+            <p class="text-gray-600">Feedback is available when viewing through the full application UI.</p>
+            {% endif %}
         </div>
 
 

@@ -110,7 +110,7 @@ class Comment(db.Model):
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=True)
 
     def __repr__(self):
-        who = self.user , self.guest_name
+        who = self.guest_name or 'Anonymous'
         return f"Comment(by {who}, '{self.content[:20]}...')"
 
 
@@ -127,7 +127,7 @@ class Rating(db.Model):
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=True)
 
     def __repr__(self):
-        who = self.user , self.guest_name
+        who = self.guest_name or 'Anonymous'
         return f"Rating({self.score} by {who})"
 
 
@@ -143,7 +143,7 @@ class Like(db.Model):
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=True)
 
     def __repr__(self):
-        who = self.user , self.guest_name
+        who = self.guest_name or 'Anonymous'
         return f"Like(by {who})"
 
 

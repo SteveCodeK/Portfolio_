@@ -37,7 +37,7 @@
                 {# Display current image when editing #}
                 {% if current_image_id %}
                 <p>Current Image:</p>
-                <img src="{{ url_for('get_image', model_name=model_name, image_id=current_image_id) }}" alt="Current Image" style="max-width: 200px;">
+                <img src="{{ url_for('main.get_image', model_name=model_name, image_id=current_image_id) }}" alt="Current Image" style="max-width: 200px;">
                 {% elif current_image and current_image == 'default_blog.jpg' and legend == 'Edit Blog Post' %}
                 <p class="text-gray-600 text-sm mt-2">No custom image uploaded. Using default.</p>
                 {% endif %}
@@ -71,12 +71,12 @@
         // --- IMAGE UPLOAD HANDLER ---
         automatic_uploads: true,
         file_picker_types: 'image',
-        images_upload_url: '{{ url_for("upload_image") }}',
+    images_upload_url: '{{ url_for("admin.upload_image") }}',
         images_upload_handler: function (blobInfo, success, failure) {
             var xhr, formData;
             xhr = new XMLHttpRequest();
             xhr.withCredentials = false;
-            xhr.open('POST', '{{ url_for("upload_image") }}');
+            xhr.open('POST', '{{ url_for("admin.upload_image") }}');
 
             xhr.onload = function() {
                 var json;
