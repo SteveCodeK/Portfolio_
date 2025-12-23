@@ -88,7 +88,8 @@ rsa==4.9
 safetensors==0.5.3
 schedule==1.2
 scikit-learn==1.6
-scipy==1.15
+scipy>=1.7,<1.14
+
 selenium==4.33
 setuptools==80.1.0
 six==1.17.0
