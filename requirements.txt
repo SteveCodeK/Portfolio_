@@ -14,6 +14,7 @@ blinker==1.9.0
 cachetools==5.5.2
 tinycss2==1.1.0
 certifi==2025.4.26
+protobuf>=3.20,<4.0
 cffi==1.17.1
 charset-normalizer==3.4.1
 flask_mail==0.10.0
