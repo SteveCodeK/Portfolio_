@@ -63,7 +63,6 @@ pandas==2.0
 pillow==11.0
 plotly==6.0
 propcache==0.3
-protobuf==4.0
 psycopg2-binary==2.9
 pyarrow==20.0
 pyasn1==0.6.1
