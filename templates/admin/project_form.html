@@ -79,7 +79,7 @@
                 {# Display current image when editing #}
                 {% if current_image_id %}
                 <p>Current Image:</p>
-                <img src="{{ url_for('main.get_image', model_name=model_name, image_id=current_image_id) }}" alt="Current Image" style="max-width: 200px;">
+                <img src="{{ url_for('get_image', model_name=model_name, image_id=current_image_id) }}" alt="Current Image" style="max-width: 200px;">
                 {% elif current_image and current_image == 'default_project.jpg' and legend == 'Edit Project' %}
                 <p class="text-gray-600 text-sm mt-2">No custom image uploaded. Using default.</p>
                 {% endif %}

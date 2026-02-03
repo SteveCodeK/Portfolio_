@@ -411,7 +411,7 @@ def upload_image():
                 db.session.add(uploaded_img)
                 db.session.commit()
 
-                image_url = url_for('main.get_image', model_name='uploaded_image', image_id=uploaded_img.id, _external=True)
+                image_url = url_for('get_image', model_name='uploaded_image', image_id=uploaded_img.id, _external=True)
                 current_app.logger.info(f"Generated image URL: {image_url}")
 
                 return jsonify({'location': image_url}), 200

@@ -1,4 +1,4 @@
-from flask import Flask, send_file, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, send_file, render_template, request, redirect, url_for, flash, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
@@ -103,9 +103,9 @@ def _load_user(user_id):
         return db.session.get(User, int(user_id))
     except Exception:
         return None
-# Load configuration and register error handlers
-def create_app(config_name=None):
 
+
+def create_app(config_name=None):
     # Load configuration based on environment
     if config_name is None:
         config_name = os.environ.get('FLASK_ENV', 'default')
@@ -115,12 +115,12 @@ def create_app(config_name=None):
     db.init_app(app)
     mail.init_app(app)
     login_manager = LoginManager(app)
-    # Ensure Flask-Login redirects to the auth login endpoint when protecting
-    # routes with @login_required. Use setattr to avoid narrow static typing issues.
     setattr(login_manager, 'login_view', 'auth.login')
-    # login_manager.login_view = 'auth.login'  # Disabled due to type error
-    sitemap = Sitemap()
-    sitemap.init_app(app)
+
+    # Initialize sitemap AFTER app is created
+    from flask_sitemap import Sitemap
+    ext = Sitemap(app=app)
+
     migrate = Migrate(app, db)
 
     # Configure logging and error handlers
@@ -129,8 +129,6 @@ def create_app(config_name=None):
     register_error_handlers(app)
 
     # Register blueprints
-    # Register blueprints with defensive error handling so import-time
-    # failures are logged and don't crash the whole process silently.
     try:
         from blueprints.main import bp as main_bp
         app.register_blueprint(main_bp)
@@ -166,33 +164,75 @@ def create_app(config_name=None):
     def load_user(user_id):
         return db.session.get(User, int(user_id))
 
-    # Register sitemap generators
-    @sitemap.register_generator
-    def my_sitemap_generator():
+    # Register sitemap generator with the extension instance
+    @ext.register_generator
+    def sitemap():
         from model import BlogPost, Project
+
         # Main routes
-        yield 'main.home', {'changefreq': 'daily', 'priority': 1.0}
-        yield 'portfolio.index', {'changefreq': 'weekly', 'priority': 0.9}
-        yield 'blog.index', {'changefreq': 'daily', 'priority': 0.9}
+        yield 'main.home', {}
+        yield 'portfolio.index', {}
+        yield 'blog.index', {}
 
         # Blog posts
-        for post in BlogPost.query.all():
-            yield 'blog.post', {
-                'slug': post.slug,
-                'lastmod': post.date_posted.isoformat() + 'Z' if post.date_posted else None,
-                'changefreq': 'weekly',
-                'priority': 0.8
-            }
+        try:
+            for post in BlogPost.query.all():
+                yield 'blog.post', {'slug': post.slug}
+        except Exception as e:
+            app.logger.error(f"Error in sitemap blog posts: {e}")
 
         # Projects
+        try:
+            for project in Project.query.all():
+                yield 'portfolio.project_detail', {'slug': project.slug}
+        except Exception as e:
+            app.logger.error(f"Error in sitemap projects: {e}")
+
+    return app
+
+# Add this to your main blueprint (blueprints/main/__init__.py or views.py)
+@app.route('/sitemap.xml')
+def sitemap():
+
+    pages = []
+
+    # Static pages
+    pages.append(['home', 1.0, 'daily'])
+    pages.append(['about', 1.0, 'daily'])
+    pages.append(['portfolio', 0.9, 'weekly'])
+    pages.append(['blog', 0.9, 'daily'])
+
+    # Blog posts
+    try:
+        for post in BlogPost.query.all():
+            pages.append(['blog_post', 0.8, 'weekly', {'slug': post.slug}, post.date_posted])
+    except Exception as e:
+        pass
+
+    # Projects
+    try:
         for project in Project.query.all():
-            last_mod_date = project.date_posted.isoformat() + 'Z' if project.date_posted else None
-            yield 'portfolio.project_detail', {
-                'slug': project.slug,
-                'lastmod': last_mod_date,
-                'changefreq': 'monthly',
-                'priority': 0.7
-            }
+            pages.append(['project_detail', 0.7, 'monthly', {'slug': project.slug}, project.date_posted])
+    except Exception as e:
+        pass
+
+    sitemap_xml = ['<?xml version="1.0" encoding="UTF-8"?>']
+    sitemap_xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
+
+    for page in pages:
+        sitemap_xml.append('<url>')
+        sitemap_xml.append(f'<loc>{url_for(page[0], **(page[3] if len(page) > 3 else {}), _external=True)}</loc>')
+        if len(page) > 4 and page[4]:
+            sitemap_xml.append(f'<lastmod>{page[4].strftime("%Y-%m-%d")}</lastmod>')
+        sitemap_xml.append(f'<changefreq>{page[2]}</changefreq>')
+        sitemap_xml.append(f'<priority>{page[1]}</priority>')
+        sitemap_xml.append('</url>')
+
+    sitemap_xml.append('</urlset>')
+
+    response = make_response('\n'.join(sitemap_xml))
+    response.headers['Content-Type'] = 'application/xml'
+    return response
 
     # Image serving route
 @app.route('/image/<string:model_name>/<int:image_id>')

@@ -77,3 +77,4 @@ def robots_txt():
     from flask import send_from_directory
     static_folder = current_app.static_folder or 'static'
     return send_from_directory(static_folder, request.path[1:])
+
